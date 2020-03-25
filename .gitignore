@@ -1,5 +1,5 @@
 node_modules
 /dist
 /target
-/pkg
+/src/pkg
 /wasm-pack.log

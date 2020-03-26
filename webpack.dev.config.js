@@ -38,8 +38,8 @@ module.exports = {
       // css-loader to bundle all the css files into one file and style-loader
       // to add all the styles inside the style tag of the document
       {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        test: /\.pcss$/,
+        use: ['style-loader', { loader: 'css-loader', options: { importLoaders: 1 } }, 'postcss-loader'],
       },
     ],
   },

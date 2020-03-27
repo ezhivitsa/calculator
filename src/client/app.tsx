@@ -1,11 +1,9 @@
 import React, { Component, ReactNode } from 'react';
 
+import { Calculator } from './components/pages/calculator';
+
 export class App extends Component {
   render(): ReactNode {
-    return (
-      <div>
-        <h1>Hello World!</h1>
-      </div>
-    );
+    return <Calculator />;
   }
 }

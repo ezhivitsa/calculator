@@ -4,6 +4,6 @@ import { App } from './app';
 
 import './styles/global.pcss';
 
-// import('../pkg/calculator.js').catch(console.error);
+import('../../pkg/calculator.js');
 
 ReactDOM.render(<App />, document.getElementById('root'));

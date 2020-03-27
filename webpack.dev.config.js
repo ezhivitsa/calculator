@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 
 const dist = path.resolve(__dirname, 'dist');
 
@@ -39,7 +40,18 @@ module.exports = {
       // to add all the styles inside the style tag of the document
       {
         test: /\.pcss$/,
-        use: ['style-loader', { loader: 'css-loader', options: { importLoaders: 1 } }, 'postcss-loader'],
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+              modules: true,
+              localsConvention: 'dashesOnly',
+            },
+          },
+          'postcss-loader',
+        ],
       },
     ],
   },
@@ -47,6 +59,11 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/client/index.html',
+    }),
+    new WasmPackPlugin({
+      crateDirectory: __dirname,
+      outName: 'calculator',
+      outDir: 'pkg',
     }),
   ],
 };

@@ -1,0 +1,1 @@
+export { buttonTexts } from './buttons';

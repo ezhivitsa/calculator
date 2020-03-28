@@ -4,5 +4,11 @@
   },
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
-  "editor.rulers": [80,120]
+  "editor.rulers": [80,120],
+  "emmet.includeLanguages": {
+    "postcss": "css"
+  },
+  "emmet.syntaxProfiles": {
+    "postcss": "css"
+  }
 }

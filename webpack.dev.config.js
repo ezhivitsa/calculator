@@ -24,6 +24,7 @@ module.exports = {
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    modules: ['node_modules', path.resolve(__dirname, 'src/client')],
   },
 
   module: {
@@ -46,7 +47,11 @@ module.exports = {
             loader: 'css-loader',
             options: {
               importLoaders: 1,
-              modules: true,
+              modules: {
+                mode: 'local',
+                localIdentName: '[local]--[hash:base64:5]',
+                context: path.resolve(__dirname, 'src/client'),
+              },
               localsConvention: 'dashesOnly',
             },
           },

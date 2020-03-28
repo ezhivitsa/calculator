@@ -1,0 +1,22 @@
+@import 'variables.pcss';
+
+.history {
+  position: relative;
+
+  &__btn {
+    border: 0;
+    background: transparent;
+    color: var(--color-grey-600);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-grey-700);
+    }
+  }
+
+  &__items {
+    position: absolute;
+    width: 450px;
+    height: auto;
+  }
+}

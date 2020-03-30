@@ -9,5 +9,10 @@ export const buttonTexts = {
   tangent: 'tan',
   sqrt: '√',
   ans: 'Ans',
-  exp: 'exp',
+  exp: 'EXP',
+  x: 'x',
+  y: 'y',
+  minusOne: '-1',
+  square: '2',
+  rnd: 'Rnd',
 };

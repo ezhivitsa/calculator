@@ -2,9 +2,11 @@
   "presets": [
       "@babel/preset-env",
       "@babel/preset-typescript",
-      "@babel/preset-react"
+      "@babel/preset-react",
+      "mobx"
   ],
   "plugins": [
-      "@babel/proposal-class-properties"
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    ["@babel/plugin-proposal-class-properties", { "loose": true }]
   ]
 }

@@ -1,1 +1,1 @@
-export class Calculation {}
+export class CalculationStore {}

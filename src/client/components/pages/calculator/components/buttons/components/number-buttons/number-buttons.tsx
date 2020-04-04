@@ -3,7 +3,7 @@ import React, { ReactElement, ReactNode } from 'react';
 import { Button } from 'components/global/button';
 
 import { NumberValue } from 'stores';
-import { useStore } from 'provider';
+import { useCalculationStore } from 'providers';
 
 import styles from './number-buttons.pcss';
 
@@ -22,14 +22,14 @@ const buttons: NumberValue[] = [
 ];
 
 export function NumberButtons(): ReactElement {
-  const calculatorStore = useStore();
+  const calculationStore = useCalculationStore();
 
   function handleResultClick(): void {
-    calculatorStore.calculateResult();
+    calculationStore.calculateResult();
   }
 
   function handleNumberClick(number: NumberValue): void {
-    calculatorStore.setNumber(number);
+    calculationStore.setNumber(number);
   }
 
   function renderButtons(): ReactNode {

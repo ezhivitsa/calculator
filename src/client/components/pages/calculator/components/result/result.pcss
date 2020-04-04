@@ -4,8 +4,22 @@
   padding: var(--grid3);
   border-radius: var(--border-radius-300);
   border: 1px solid var(--color-grey-300);
+  position: relative;
 
   &:hover {
     border-color: var(--color-grey-500);
+  }
+
+  &__top-expression {
+    position: absolute;
+    font-size: var(--font-size-400);
+    color: var(--color-grey-500);
+    top: var(--grid2);
+    right: var(--grid3);
+  }
+
+  &__expression {
+    text-align: right;
+    font-size: var(--font-size-900);
   }
 }

@@ -1,16 +1,18 @@
 import React, { Component, ReactNode } from 'react';
 
-import { CalculatorStore } from 'stores/calculator';
+import { CalculatorStore, CalculationStore } from 'stores';
 
-import { StoreProvider } from './provider';
+import { CalculatorStoreProvider, CalculationStoreProvider } from './providers';
 import { Calculator } from './components/pages/calculator';
 
 export class App extends Component {
   render(): ReactNode {
     return (
-      <StoreProvider value={new CalculatorStore()}>
-        <Calculator />
-      </StoreProvider>
+      <CalculatorStoreProvider value={new CalculatorStore()}>
+        <CalculationStoreProvider value={new CalculationStore()}>
+          <Calculator />
+        </CalculationStoreProvider>
+      </CalculatorStoreProvider>
     );
   }
 }

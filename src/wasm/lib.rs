@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 
@@ -42,3 +44,22 @@ pub fn main_js() -> Result<(), JsValue> {
 // pub fn send_message_remove(value: u32) {
 //     handle_messages(Message::Remove(value));
 // }
+
+#[wasm_bindgen]
+pub struct Calculator {
+    pub value: f64,
+}
+
+#[wasm_bindgen]
+impl Calculator {
+    pub fn new()-> Calculator {
+        Calculator {
+            value: 0.0
+        }
+    }
+
+    pub fn add(&mut self, value: &str) {
+        let value_num = f64::from_str(value).unwrap();
+        self.value += value_num;
+    }
+}

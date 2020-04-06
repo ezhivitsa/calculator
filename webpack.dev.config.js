@@ -24,7 +24,7 @@ module.exports = {
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
-    modules: ['node_modules', path.resolve(__dirname, 'src/client')],
+    modules: ['node_modules', path.resolve(__dirname, 'src/client'), __dirname],
   },
 
   module: {

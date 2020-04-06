@@ -11,5 +11,8 @@ webpack-dev:
 
 dev: clean webpack-dev
 
+deps:
+	npm ci
+
 lint-styles:
 	npx stylelint "src/client/**/*.pcss"

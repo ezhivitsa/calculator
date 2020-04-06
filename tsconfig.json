@@ -19,6 +19,9 @@
 		// use typescript to transpile jsx to js
 		"jsx": "react",
 		"baseUrl": "./src/client",
+		"paths": {
+      "pkg/*":["../../pkg"]
+    },
 		"lib": [
 			"es2015",
 			"dom.iterable",

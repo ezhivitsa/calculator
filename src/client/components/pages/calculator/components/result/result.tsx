@@ -15,8 +15,7 @@ export const Result = observer(
       <div className={styles.result}>
         <History />
 
-        {showResult && <div className={styles.result_topExpression}>{expression}</div>}
-        <div className={styles.result__topExpression}>123</div>
+        {showResult && <div className={styles.result__topExpression}>{expression}</div>}
         <div className={styles.result__expression}>{showResult ? result : expression}</div>
       </div>
     );

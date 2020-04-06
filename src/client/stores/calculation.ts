@@ -2,6 +2,9 @@ import { observable, computed, action } from 'mobx';
 
 import { isNumber } from 'lib/numbers';
 
+import { Calculator } from 'pkg/calculator.d.ts';
+import { getCalculator } from 'wasm/calculator';
+
 export enum NumberValue {
   ZERO = '0',
   ONE = '1',
@@ -40,12 +43,15 @@ interface Action {
 }
 
 const START_NUMBER = '0';
+const PRIORITY_ACTIONS = [MathAction.DIVIDE, MathAction.MULTIPLY];
 
 export class CalculationStore {
   @observable private _actions: Action[] = [];
   @observable private _result: string | null = null;
   @observable private _currentNumber = START_NUMBER;
   @observable private _currentMathAction: MathAction | null = null;
+
+  private _calculatorWasm: Promise<Calculator> = getCalculator();
 
   @computed
   get result(): string {
@@ -141,5 +147,47 @@ export class CalculationStore {
   addParentheses(parentheses: Parentheses): void {}
 
   @action
-  calculateResult(): void {}
+  async calculateResult(): Promise<void> {
+    const { _currentNumber, _currentMathAction, _actions } = this;
+
+    if (isNumber(_currentNumber)) {
+      this._actions.push({
+        mathAction: _currentMathAction,
+        value: _currentNumber,
+      });
+
+      this._currentNumber = '';
+      this._currentMathAction = null;
+    }
+
+    const calc = await this._calculatorWasm;
+    calc.reset();
+
+    const actions = [];
+    for (let i = 0; i < _actions.length; i += 1) {
+      const action = _actions[i];
+      const nextAction = _actions[i + 1];
+
+      if (nextAction && nextAction.mathAction && PRIORITY_ACTIONS.includes(nextAction.mathAction)) {
+        let value: string;
+        // switch (nextAction.mathAction) {
+        //   case MathAction.DIVIDE:
+        //     value = calc.divide();
+        // }
+      } else {
+        actions.push(action);
+      }
+    }
+
+    for (const action of this._actions) {
+      switch (action.mathAction) {
+        case MathAction.PLUS:
+        case null:
+          calc.add(action.value);
+          break;
+      }
+    }
+
+    this._result = calc.result();
+  }
 }

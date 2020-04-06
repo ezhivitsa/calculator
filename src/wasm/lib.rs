@@ -25,9 +25,6 @@ pub fn main_js() -> Result<(), JsValue> {
     #[cfg(debug_assertions)]
     console_error_panic_hook::set_once();
 
-    //CALCULATOR.clear();
-    console::log_1(&JsValue::from_str("Hello!1"));
-
     Ok(())
 }
 
@@ -61,5 +58,21 @@ impl Calculator {
     pub fn add(&mut self, value: &str) {
         let value_num = f64::from_str(value).unwrap();
         self.value += value_num;
+    }
+
+    pub fn divide(value1: &str, value2: &str) -> String {
+        let num1 = f64::from_str(value1).unwrap();
+        let num2 = f64::from_str(value2).unwrap();
+
+        let result = num1 / num2;
+        result.to_string()
+    }
+
+    pub fn result(&self) -> String {
+        self.value.to_string()
+    }
+
+    pub fn reset(&mut self) {
+        self.value = 0.0;
     }
 }

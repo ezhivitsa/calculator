@@ -68,6 +68,14 @@ impl Calculator {
         result.to_string()
     }
 
+    pub fn multiply(value1: &str, value2: &str) -> String {
+        let num1 = f64::from_str(value1).unwrap();
+        let num2 = f64::from_str(value2).unwrap();
+
+        let result = num1 * num2;
+        result.to_string()
+    }
+
     pub fn result(&self) -> String {
         self.value.to_string()
     }

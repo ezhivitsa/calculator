@@ -2,8 +2,7 @@ import { observable, computed, action } from 'mobx';
 
 import { isNumber } from 'lib/numbers';
 
-import { Calculator } from 'pkg/calculator.d.ts';
-import { getCalculator } from 'wasm/calculator';
+import { CalculatorAdapter } from 'adapters/calculator';
 
 export enum NumberValue {
   ZERO = '0',
@@ -51,7 +50,7 @@ export class CalculationStore {
   @observable private _currentNumber = START_NUMBER;
   @observable private _currentMathAction: MathAction | null = null;
 
-  private _calculatorWasm: Promise<Calculator> = getCalculator();
+  private _calculator: CalculatorAdapter = new CalculatorAdapter();
 
   @computed
   get result(): string {
@@ -160,8 +159,7 @@ export class CalculationStore {
       this._currentMathAction = null;
     }
 
-    const calc = await this._calculatorWasm;
-    calc.reset();
+    await this._calculator.reset();
 
     const actions = [];
     for (let i = 0; i < _actions.length; i += 1) {
@@ -170,10 +168,24 @@ export class CalculationStore {
 
       if (nextAction && nextAction.mathAction && PRIORITY_ACTIONS.includes(nextAction.mathAction)) {
         let value: string;
-        // switch (nextAction.mathAction) {
-        //   case MathAction.DIVIDE:
-        //     value = calc.divide();
-        // }
+
+        switch (nextAction.mathAction) {
+          case MathAction.DIVIDE:
+            value = await this._calculator.divide(action.value, nextAction.value);
+            break;
+
+          case MathAction.MULTIPLY:
+            value = await this._calculator.multiply(action.value, nextAction.value);
+            break;
+
+          default:
+            value = START_NUMBER;
+        }
+
+        actions.push({
+          mathAction: action.mathAction,
+          value,
+        });
       } else {
         actions.push(action);
       }
@@ -183,11 +195,11 @@ export class CalculationStore {
       switch (action.mathAction) {
         case MathAction.PLUS:
         case null:
-          calc.add(action.value);
+          await this._calculator.add(action.value);
           break;
       }
     }
 
-    this._result = calc.result();
+    this._result = await this._calculator.result();
   }
 }

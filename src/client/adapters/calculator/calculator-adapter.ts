@@ -52,6 +52,16 @@ export class CalculatorAdapter {
     instance.add(value);
   }
 
+  async subtract(value: string): Promise<void> {
+    const instance = await this._getInstance();
+    instance.subtract(value);
+  }
+
+  async set(value: string): Promise<void> {
+    const instance = await this._getInstance();
+    instance.set(value);
+  }
+
   async divide(value1: string, value2: string): Promise<string> {
     const struct = await this._getStruct();
     return struct.divide(value1, value2);

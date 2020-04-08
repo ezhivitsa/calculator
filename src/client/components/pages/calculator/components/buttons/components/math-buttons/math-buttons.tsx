@@ -43,6 +43,8 @@ export const MathButtons = observer(
 
       if (!calculationStore.showResult) {
         calculationStore.clean();
+      } else {
+        calculationStore.cleanAll();
       }
     }
 

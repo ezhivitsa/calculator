@@ -42,6 +42,18 @@ pub fn main_js() -> Result<(), JsValue> {
 //     handle_messages(Message::Remove(value));
 // }
 
+fn parse_float(value: &str) -> f64 {
+    let result = f64::from_str(value);
+    match result {
+        Ok(num) => {
+            num
+        }
+        Err(err) => {
+            panic!("Unable to convert {} into number", value)
+        }
+    }
+}
+
 #[wasm_bindgen]
 pub struct Calculator {
     pub value: f64,
@@ -55,22 +67,32 @@ impl Calculator {
         }
     }
 
+    pub fn set(&mut self, value: &str) {
+        let value_num = parse_float(value);
+        self.value = value_num;
+    }
+
     pub fn add(&mut self, value: &str) {
-        let value_num = f64::from_str(value).unwrap();
+        let value_num = parse_float(value);
         self.value += value_num;
     }
 
+    pub fn subtract(&mut self, value: &str) {
+        let value_num = parse_float(value);
+        self.value -= value_num;
+    }
+
     pub fn divide(value1: &str, value2: &str) -> String {
-        let num1 = f64::from_str(value1).unwrap();
-        let num2 = f64::from_str(value2).unwrap();
+        let num1 = parse_float(value1);
+        let num2 = parse_float(value2);
 
         let result = num1 / num2;
         result.to_string()
     }
 
     pub fn multiply(value1: &str, value2: &str) -> String {
-        let num1 = f64::from_str(value1).unwrap();
-        let num2 = f64::from_str(value2).unwrap();
+        let num1 = parse_float(value1);
+        let num2 = parse_float(value2);
 
         let result = num1 * num2;
         result.to_string()

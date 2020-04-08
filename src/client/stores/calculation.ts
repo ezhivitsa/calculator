@@ -47,6 +47,7 @@ const PRIORITY_ACTIONS = [MathAction.DIVIDE, MathAction.MULTIPLY];
 export class CalculationStore {
   @observable private _actions: Action[] = [];
   @observable private _result: string | null = null;
+
   @observable private _currentNumber = START_NUMBER;
   @observable private _currentMathAction: MathAction | null = null;
 
@@ -118,6 +119,7 @@ export class CalculationStore {
   cleanAll(): void {
     this._actions = [];
     this._currentMathAction = null;
+    this._result = null;
     this._currentNumber = START_NUMBER;
   }
 
@@ -191,11 +193,18 @@ export class CalculationStore {
       }
     }
 
-    for (const action of this._actions) {
+    for (const action of actions) {
       switch (action.mathAction) {
-        case MathAction.PLUS:
         case null:
+          await this._calculator.set(action.value);
+          break;
+
+        case MathAction.PLUS:
           await this._calculator.add(action.value);
+          break;
+
+        case MathAction.MINUS:
+          await this._calculator.subtract(action.value);
           break;
       }
     }

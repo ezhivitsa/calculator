@@ -82,22 +82,6 @@ impl Calculator {
         self.value -= value_num;
     }
 
-    pub fn divide(value1: &str, value2: &str) -> String {
-        let num1 = parse_float(value1);
-        let num2 = parse_float(value2);
-
-        let result = num1 / num2;
-        result.to_string()
-    }
-
-    pub fn multiply(value1: &str, value2: &str) -> String {
-        let num1 = parse_float(value1);
-        let num2 = parse_float(value2);
-
-        let result = num1 * num2;
-        result.to_string()
-    }
-
     pub fn result(&self) -> String {
         self.value.to_string()
     }
@@ -105,4 +89,40 @@ impl Calculator {
     pub fn reset(&mut self) {
         self.value = 0.0;
     }
+}
+
+#[wasm_bindgen]
+pub fn add(value1: &str, value2: &str) -> String {
+    let value1_num = parse_float(value1);
+    let value2_num = parse_float(value2);
+
+    let result = value1_num + value2_num;
+    result.to_string()
+}
+
+#[wasm_bindgen]
+pub fn subtract(value1: &str, value2: &str) -> String {
+    let value1_num = parse_float(value1);
+    let value2_num = parse_float(value2);
+
+    let result = value1_num - value2_num;
+    result.to_string()
+}
+
+#[wasm_bindgen]
+pub fn divide(value1: &str, value2: &str) -> String {
+    let num1 = parse_float(value1);
+    let num2 = parse_float(value2);
+
+    let result = num1 / num2;
+    result.to_string()
+}
+
+#[wasm_bindgen]
+pub fn multiply(value1: &str, value2: &str) -> String {
+    let num1 = parse_float(value1);
+    let num2 = parse_float(value2);
+
+    let result = num1 * num2;
+    result.to_string()
 }

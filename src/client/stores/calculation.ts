@@ -1,8 +1,9 @@
-import { observable, computed, action } from 'mobx';
+import { observable, computed, action, runInAction } from 'mobx';
 
 import { isNumber } from 'lib/numbers';
 
-import { CalculatorAdapter } from 'adapters/calculator';
+import { ActionsStore, MathAction, Parentheses } from './actions';
+import { CommandsStore, CommandType, Command } from './commands';
 
 export enum NumberValue {
   ZERO = '0',
@@ -18,40 +19,22 @@ export enum NumberValue {
   DOT = '.',
 }
 
-export enum MathAction {
-  DIVIDE = '÷',
-  MULTIPLY = '×',
-  MINUS = '−',
-  PLUS = '+',
-  PERCENT = '%',
-}
-
 export enum CleanAction {
   CLEAN_ONE = 'CE',
   CLEAN_RESULT = 'AC',
 }
 
-export enum Parentheses {
-  LEFT = '(',
-  RIGHT = ')',
-}
-
-interface Action {
-  mathAction: MathAction | null;
-  value: string;
-}
-
 const START_NUMBER = '0';
-const PRIORITY_ACTIONS = [MathAction.DIVIDE, MathAction.MULTIPLY];
 
 export class CalculationStore {
-  @observable private _actions: Action[] = [];
+  @observable private _expression = '';
   @observable private _result: string | null = null;
 
-  @observable private _currentNumber = START_NUMBER;
-  @observable private _currentMathAction: MathAction | null = null;
+  private _commands: CommandsStore = new CommandsStore();
 
-  private _calculator: CalculatorAdapter = new CalculatorAdapter();
+  private get _actions(): ActionsStore {
+    return this._commands.actions;
+  }
 
   @computed
   get result(): string {
@@ -65,150 +48,95 @@ export class CalculationStore {
 
   @computed
   get expression(): string {
-    let result = this._actions
-      .map((action) => {
-        return action.mathAction ? `${action.mathAction} ${action.value}` : action.value;
-      })
-      .join(' ');
-
-    if (this._currentMathAction) {
-      result += ` ${this._currentMathAction}`;
-    }
-
-    if (this._currentNumber) {
-      result += ` ${this._currentNumber}`;
-    }
-
-    return result;
+    return this._expression ? this._expression : START_NUMBER;
   }
 
   @action
   setNumber(value: NumberValue): void {
-    if (value !== NumberValue.DOT && this._currentNumber === START_NUMBER) {
-      this._currentNumber = value;
+    if (value === NumberValue.DOT && this._expression === '') {
+      this._expression += '0.';
+      this._commands.addCommand({
+        type: CommandType.SET_VALUE,
+        value: '0.',
+      });
       return;
     }
 
-    const newNumber = this._currentNumber + value;
+    if (this._actions.closedParentheses) {
+      this._expression += value;
+      this._commands.addCommands(
+        {
+          type: CommandType.ADD_MATH_OPERATION,
+          operation: MathAction.MULTIPLY,
+        },
+        {
+          type: CommandType.SET_VALUE,
+          value,
+        },
+      );
+      return;
+    }
+
+    const newNumber = this._actions.lastValue + value;
     if (isNumber(newNumber)) {
-      this._currentNumber = newNumber;
+      this._expression += value;
+      this._commands.addCommand({
+        type: CommandType.SET_VALUE,
+        value: newNumber,
+      });
     }
   }
 
   @action
   addAction(action: MathAction): void {
-    if (action === MathAction.MINUS && [START_NUMBER, ''].includes(this._currentNumber)) {
-      this._currentNumber = '-';
+    // if (action === MathAction.MINUS && [START_NUMBER, ''].includes(this._expression)) {
+    //   this._actions.setValue('-');
+    //   return;
+    // }
+
+    if (!(this._actions.closedParentheses || isNumber(this._actions.lastValue))) {
       return;
     }
 
-    if (!isNumber(this._currentNumber)) {
-      return;
-    }
-
-    this._actions.push({
-      mathAction: this._currentMathAction,
-      value: this._currentNumber,
+    this._commands.addCommand({
+      type: CommandType.ADD_MATH_OPERATION,
+      operation: action,
     });
-
-    this._currentMathAction = action;
-    this._currentNumber = '';
+    this._expression += action;
   }
 
   @action
   cleanAll(): void {
-    this._actions = [];
-    this._currentMathAction = null;
-    this._result = null;
-    this._currentNumber = START_NUMBER;
+    this._commands.removeAllCommands();
+    this._result = '';
+    //this._result = null;
   }
 
   @action
   clean(): void {
-    const { _currentNumber, _actions } = this;
-    if (_currentNumber.length > 1 || (_actions.length && _currentNumber.length)) {
-      this._currentNumber = _currentNumber.slice(0, _currentNumber.length - 1);
-      return;
-    }
-
-    if (!_currentNumber.length && _actions.length) {
-      const action = _actions.pop() as Action;
-
-      this._currentNumber = action.value;
-      this._currentMathAction = action.mathAction;
-    }
-
-    if (!_actions.length && _currentNumber.length === 1) {
-      this._currentNumber = START_NUMBER;
-      this._currentMathAction = null;
-    }
+    this._commands.removeLastCommand();
+    this._expression = this._expression.slice(0, this._expression.length - 1);
   }
 
   @action
-  addParentheses(parentheses: Parentheses): void {}
+  addParentheses(parentheses: Parentheses): void {
+    const command: Command =
+      parentheses === Parentheses.LEFT
+        ? {
+            type: CommandType.ADD_LEFT_PARENTHESES,
+          }
+        : {
+            type: CommandType.ADD_RIGHT_PARENTHESES,
+          };
+    this._commands.addCommand(command);
+    this._expression += parentheses;
+  }
 
   @action
   async calculateResult(): Promise<void> {
-    const { _currentNumber, _currentMathAction, _actions } = this;
-
-    if (isNumber(_currentNumber)) {
-      this._actions.push({
-        mathAction: _currentMathAction,
-        value: _currentNumber,
-      });
-
-      this._currentNumber = '';
-      this._currentMathAction = null;
-    }
-
-    await this._calculator.reset();
-
-    const actions = [];
-    for (let i = 0; i < _actions.length; i += 1) {
-      const action = _actions[i];
-      const nextAction = _actions[i + 1];
-
-      if (nextAction && nextAction.mathAction && PRIORITY_ACTIONS.includes(nextAction.mathAction)) {
-        let value: string;
-
-        switch (nextAction.mathAction) {
-          case MathAction.DIVIDE:
-            value = await this._calculator.divide(action.value, nextAction.value);
-            break;
-
-          case MathAction.MULTIPLY:
-            value = await this._calculator.multiply(action.value, nextAction.value);
-            break;
-
-          default:
-            value = START_NUMBER;
-        }
-
-        actions.push({
-          mathAction: action.mathAction,
-          value,
-        });
-      } else {
-        actions.push(action);
-      }
-    }
-
-    for (const action of actions) {
-      switch (action.mathAction) {
-        case null:
-          await this._calculator.set(action.value);
-          break;
-
-        case MathAction.PLUS:
-          await this._calculator.add(action.value);
-          break;
-
-        case MathAction.MINUS:
-          await this._calculator.subtract(action.value);
-          break;
-      }
-    }
-
-    this._result = await this._calculator.result();
+    const result = await this._actions.calculateResult();
+    runInAction(() => {
+      this._result = result;
+    });
   }
 }

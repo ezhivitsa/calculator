@@ -1,5 +1,8 @@
 import React, { useState, ReactElement, ReactNode } from 'react';
 
+import { MathModifier } from 'stores';
+import { useCalculationStore } from 'providers';
+
 import { buttonTexts } from 'texts/buttons';
 
 import { Button } from 'components/global/button';
@@ -14,6 +17,11 @@ interface Button {
 
 export function ScientificButtons(): ReactElement {
   const [showInverse, setShowInverse] = useState(false);
+  const calculationStore = useCalculationStore();
+
+  function handleModifierClick(modifier: MathModifier): void {
+    calculationStore.addModifier(modifier);
+  }
 
   function handleInverseClick(): void {
     setShowInverse(!showInverse);
@@ -28,6 +36,7 @@ export function ScientificButtons(): ReactElement {
     {
       title: buttonTexts.sinus,
       inverse: false,
+      onClick: () => handleModifierClick(MathModifier.SIN),
     },
     {
       title: (
@@ -37,10 +46,12 @@ export function ScientificButtons(): ReactElement {
         </span>
       ),
       inverse: true,
+      onClick: () => handleModifierClick(MathModifier.ASIN),
     },
     {
       title: buttonTexts.logarithmNatural,
       inverse: false,
+      onClick: () => handleModifierClick(MathModifier.LN),
     },
     {
       title: (
@@ -58,6 +69,7 @@ export function ScientificButtons(): ReactElement {
     {
       title: buttonTexts.cosine,
       inverse: false,
+      onClick: () => handleModifierClick(MathModifier.COS),
     },
     {
       title: (
@@ -67,10 +79,12 @@ export function ScientificButtons(): ReactElement {
         </span>
       ),
       inverse: true,
+      onClick: () => handleModifierClick(MathModifier.ACOS),
     },
     {
       title: buttonTexts.logarithm,
       inverse: false,
+      onClick: () => handleModifierClick(MathModifier.LOG),
     },
     {
       title: (
@@ -88,6 +102,7 @@ export function ScientificButtons(): ReactElement {
     {
       title: buttonTexts.tangent,
       inverse: false,
+      onClick: () => handleModifierClick(MathModifier.TAN),
     },
     {
       title: (
@@ -97,10 +112,12 @@ export function ScientificButtons(): ReactElement {
         </span>
       ),
       inverse: true,
+      onClick: () => handleModifierClick(MathModifier.ATAN),
     },
     {
       title: buttonTexts.sqrt,
       inverse: false,
+      onClick: () => handleModifierClick(MathModifier.SQUARE_ROOT),
     },
     {
       title: (
@@ -122,6 +139,7 @@ export function ScientificButtons(): ReactElement {
     {
       title: buttonTexts.exp,
       inverse: null,
+      onClick: () => handleModifierClick(MathModifier.EXP),
     },
     {
       title: (

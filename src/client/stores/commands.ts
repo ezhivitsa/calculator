@@ -1,10 +1,11 @@
-import { ActionsStore, MathAction } from './actions';
+import { ActionsStore, MathAction, MathModifier } from './actions';
 
 export enum CommandType {
   SET_VALUE = 'set-value',
   ADD_MATH_OPERATION = 'add-math-operation',
   ADD_LEFT_PARENTHESES = 'add-left-parentheses',
   ADD_RIGHT_PARENTHESES = 'add-right-parentheses',
+  ADD_MODIFIER = 'add-modifier',
 }
 
 export type Command =
@@ -21,6 +22,10 @@ export type Command =
     }
   | {
       type: CommandType.ADD_RIGHT_PARENTHESES;
+    }
+  | {
+      type: CommandType.ADD_MODIFIER;
+      modifier: MathModifier;
     };
 
 export class CommandsStore {
@@ -43,6 +48,10 @@ export class CommandsStore {
 
       case CommandType.ADD_RIGHT_PARENTHESES:
         actionsStore.addRightParentheses();
+        break;
+
+      case CommandType.ADD_MODIFIER:
+        actionsStore.addModifier(command.modifier);
         break;
     }
   }

@@ -3,6 +3,7 @@ interface CalculatorActions {
   subtract: (value1: string, value2: string) => string;
   divide: (value1: string, value2: string) => string;
   multiply: (value1: string, value2: string) => string;
+  arccos: (value: string) => string;
 }
 
 export class CalculatorAdapter {
@@ -14,13 +15,14 @@ export class CalculatorAdapter {
   }
 
   private async _init(): Promise<CalculatorActions> {
-    const { add, subtract, divide, multiply } = await import('../../../../pkg/calculator');
+    const { add, subtract, divide, multiply, arccos } = await import('../../../../pkg/calculator');
 
     this._calculatorInstance = {
       add,
       subtract,
       divide,
       multiply,
+      arccos,
     };
     return this._calculatorInstance;
   }
@@ -53,5 +55,11 @@ export class CalculatorAdapter {
   async multiply(value1: string, value2: string): Promise<string> {
     const instance = await this._getInstance();
     return instance.multiply(value1, value2);
+  }
+
+  async acos(value: string): Promise<string | null> {
+    const instance = await this._getInstance();
+    const result = instance.arccos(value);
+    return result ? result : null;
   }
 }

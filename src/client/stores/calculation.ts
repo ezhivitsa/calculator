@@ -2,7 +2,7 @@ import { observable, computed, action, runInAction } from 'mobx';
 
 import { isNumber } from 'lib/numbers';
 
-import { ActionsStore, MathAction, Parentheses } from './actions';
+import { ActionsStore, MathAction, Parentheses, MathModifier } from './actions';
 import { CommandsStore, CommandType, Command } from './commands';
 
 export enum NumberValue {
@@ -103,6 +103,14 @@ export class CalculationStore {
       operation: action,
     });
     this._expression += action;
+  }
+
+  @action
+  addModifier(modifier: MathModifier): void {
+    this._commands.addCommand({
+      type: CommandType.ADD_MODIFIER,
+      modifier,
+    });
   }
 
   @action

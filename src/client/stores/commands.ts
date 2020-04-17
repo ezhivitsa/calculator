@@ -1,74 +1,50 @@
-import { ActionsStore, MathAction, MathModifier } from './actions';
+import { ActionsStore } from './actions';
+import { CommandType, Command, AddValueCommand, AddMathOperationCommand, AddModifierCommand } from './types';
 
-export enum CommandType {
-  SET_VALUE = 'set-value',
-  ADD_MATH_OPERATION = 'add-math-operation',
-  ADD_LEFT_PARENTHESES = 'add-left-parentheses',
-  ADD_RIGHT_PARENTHESES = 'add-right-parentheses',
-  ADD_MODIFIER = 'add-modifier',
-}
-
-export type Command =
-  | {
-      type: CommandType.SET_VALUE;
-      value: string;
-    }
-  | {
-      type: CommandType.ADD_MATH_OPERATION;
-      operation: MathAction;
-    }
-  | {
-      type: CommandType.ADD_LEFT_PARENTHESES;
-    }
-  | {
-      type: CommandType.ADD_RIGHT_PARENTHESES;
-    }
-  | {
-      type: CommandType.ADD_MODIFIER;
-      modifier: MathModifier;
-    };
+import { ApplicationService } from './application.service';
 
 export class CommandsStore {
   private _commands: Command[] = [];
   private _actions: ActionsStore = new ActionsStore();
+  private _applicationService = new ApplicationService();
 
   private _applyCommand(actionsStore: ActionsStore, command: Command): void {
     switch (command.type) {
-      case CommandType.SET_VALUE:
-        actionsStore.setValue(command.value);
+      case CommandType.ADD_VALUE:
+        this._applicationService.handleSetValue(command as AddValueCommand);
         break;
 
       case CommandType.ADD_MATH_OPERATION:
-        actionsStore.addAction(command.operation);
+        this._applicationService.handleAddOperation(command as AddMathOperationCommand);
         break;
 
       case CommandType.ADD_LEFT_PARENTHESES:
-        actionsStore.addLeftParentheses();
+        this._applicationService.handleAddLeftParentheses();
         break;
 
       case CommandType.ADD_RIGHT_PARENTHESES:
-        actionsStore.addRightParentheses();
+        this._applicationService.handleAddRightParentheses();
         break;
 
       case CommandType.ADD_MODIFIER:
-        actionsStore.addModifier(command.modifier);
+        this._applicationService.handleAddModifier(command as AddModifierCommand);
         break;
     }
+  }
+
+  private _addCommand(command: Command): void {
+    this._commands.push(command);
+    this._applyCommand(this._actions, command);
+    console.log(this._actions._rootExpression);
   }
 
   get actions(): ActionsStore {
     return this._actions;
   }
 
-  addCommand(command: Command): void {
-    this._commands.push(command);
-    this._applyCommand(this._actions, command);
-    console.log(this._actions._rootExpression);
-  }
-
-  addCommands(...commands: Command[]): void {
+  send(...commands: Command[]): void {
     for (const command of commands) {
-      this.addCommand(command);
+      this._addCommand(command);
     }
   }
 

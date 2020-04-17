@@ -1,5 +1,7 @@
 import { CalculatorAdapter } from 'adapters/calculator';
 
+import { ValueChangedEvent, OperationAddedEvent } from './types';
+
 export enum Parentheses {
   LEFT = '(',
   RIGHT = ')',
@@ -130,6 +132,7 @@ export class ActionsStore {
       return null;
     }
 
+    console.log(valueString);
     switch (modifier) {
       case MathModifier.ACOS:
         return this._calculator.acos(valueString);
@@ -153,9 +156,6 @@ export class ActionsStore {
   private _addActionForBinaryExpression(currentExpression: BinaryExpression, action: MathAction): void {
     const { left, operation, right } = currentExpression;
 
-    if (!left || (operation !== null && !right)) {
-      return;
-    }
     if (operation === null) {
       currentExpression.operation = action;
       return;
@@ -184,9 +184,6 @@ export class ActionsStore {
 
   private _addActionForSingleExpression(currentExpression: SingleExpression, action: MathAction): void {
     const { value } = currentExpression;
-    if (!value) {
-      return;
-    }
 
     const expression = {
       left: value,
@@ -208,15 +205,17 @@ export class ActionsStore {
     const { left, right } = currentExpression;
     if (!left) {
       currentExpression.left = expression;
+      this._expression = expression;
       return;
     }
 
     if (!right) {
       currentExpression.right = expression;
+      this._expression = expression;
       return;
     }
 
-    this.addAction(MathAction.MULTIPLY);
+    //this.handleOperationAdded(MathAction.MULTIPLY);
     this.addModifier(modifier);
     return;
   }
@@ -232,10 +231,11 @@ export class ActionsStore {
 
     if (!value) {
       currentExpression.value = expression;
+      this._expression = expression;
       return;
     }
 
-    this.addAction(MathAction.MULTIPLY);
+    //this.handleOperationAdded(MathAction.MULTIPLY);
     this.addModifier(modifier);
   }
 
@@ -243,8 +243,8 @@ export class ActionsStore {
 
   private _addPostfixModifierForSingleExpression(currentExpression: SingleExpression, modifier: MathModifier): void {}
 
-  addLeftParentheses(): void {
-    const { left, operation, right } = this._expression;
+  private _addLeftParenthesesForBinaryExpression(currentExpression: BinaryExpression): void {
+    const { left, operation, right } = currentExpression;
     const expression: BinaryExpression = {
       left: '',
       operation: null,
@@ -253,58 +253,116 @@ export class ActionsStore {
     };
 
     if (!left) {
-      this._expression.left = expression;
+      currentExpression.left = expression;
       this._expression = expression;
       return;
     }
 
     if (!operation) {
-      this._expression.operation = MathAction.MULTIPLY;
-      this._expression.right = expression;
+      currentExpression.operation = MathAction.MULTIPLY;
+      currentExpression.right = expression;
       this._expression = expression;
       return;
     }
 
     if (!right) {
-      this._expression.right = expression;
+      currentExpression.right = expression;
       this._expression = expression;
       return;
     }
 
     const rightExpression = {
-      left: this._expression.right,
+      left: right,
       operation: MathAction.MULTIPLY,
       right: expression,
       parent: this._expression,
     };
     expression.parent = rightExpression;
-    this._expression.right = rightExpression;
+    currentExpression.right = rightExpression;
+    this._expression = expression;
+  }
+
+  private _addLeftParenthesesForSingleExpression(currentExpression: SingleExpression): void {
+    const { value } = currentExpression;
+    const expression: BinaryExpression = {
+      left: '',
+      operation: null,
+      right: '',
+      parent: this._expression,
+    };
+
+    if (!value) {
+      currentExpression.value = expression;
+      this._expression = expression;
+      return;
+    }
+
+    const valueExpression = {
+      left: value,
+      operation: MathAction.MULTIPLY,
+      right: expression,
+      parent: this._expression,
+    };
+    expression.parent = valueExpression;
+    currentExpression.value = valueExpression;
     this._expression = expression;
   }
 
   addRightParentheses(): void {
-    const { left, operation, right, parent } = this._expression;
-    if (!left || (operation && !right) || !parent) {
+    const { parent } = this._expression;
+    if (!parent) {
       return;
+    }
+
+    if (instanceofBinaryExpression(this._expression)) {
+      const { left, operation, right } = this._expression;
+
+      if (!left || (operation && !right)) {
+        return;
+      }
+    }
+
+    if (instanceofSingleExpression(this._expression)) {
+      const { value } = this._expression;
+      if (!value) {
+        return;
+      }
     }
 
     this._expression = parent;
   }
 
   get lastValue(): string {
-    const { left, operation, right } = this._expression;
-    if (operation === null) {
-      return left as string;
-    } else {
-      return right as string;
+    if (instanceofBinaryExpression(this._expression)) {
+      const { left, operation, right } = this._expression;
+      if (operation === null) {
+        return left as string;
+      } else {
+        return right as string;
+      }
     }
+
+    if (instanceofSingleExpression(this._expression)) {
+      const { value } = this._expression;
+      return value as string;
+    }
+
+    return '';
   }
 
   get closedParentheses(): boolean {
-    return typeof this._expression.right !== 'string';
+    if (instanceofBinaryExpression(this._expression)) {
+      return typeof this._expression.right !== 'string';
+    }
+
+    if (instanceofSingleExpression(this._expression)) {
+      return typeof this._expression.value !== 'string';
+    }
+
+    return false;
   }
 
-  setValue(value: string): void {
+  handleValueChanged({ value }: ValueChangedEvent): void {
     if (instanceofBinaryExpression(this._expression)) {
       if (this._expression.operation === null) {
         this._expression.left = value;
@@ -312,15 +370,29 @@ export class ActionsStore {
         this._expression.right = value;
       }
     }
+
+    if (instanceofSingleExpression(this._expression)) {
+      this._expression.value = value;
+    }
   }
 
-  addAction(action: MathAction): void {
+  handleOperationAdded({ operation }: OperationAddedEvent): void {
     if (instanceofBinaryExpression(this._expression)) {
-      return this._addActionForBinaryExpression(this._expression, action);
+      return this._addActionForBinaryExpression(this._expression, operation);
     }
 
     if (instanceofSingleExpression(this._expression)) {
-      return this._addActionForSingleExpression(this._expression, action);
+      return this._addActionForSingleExpression(this._expression, operation);
+    }
+  }
+
+  handleLeftParenthesesAdded(): void {
+    if (instanceofBinaryExpression(this._expression)) {
+      return this._addLeftParenthesesForBinaryExpression(this._expression);
+    }
+
+    if (instanceofSingleExpression(this._expression)) {
+      return this._addLeftParenthesesForSingleExpression(this._expression);
     }
   }
 
@@ -348,3 +420,5 @@ export class ActionsStore {
     return this._calculateExpression(this._rootExpression);
   }
 }
+
+export const actionsStore = new ActionsStore();

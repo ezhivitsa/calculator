@@ -3,7 +3,9 @@ import { observable, computed, action, runInAction } from 'mobx';
 import { isNumber } from 'lib/numbers';
 
 import { ActionsStore, MathAction, Parentheses, MathModifier } from './actions';
-import { CommandsStore, CommandType, Command } from './commands';
+import { CommandsStore } from './commands';
+
+import { CommandType, Command } from './types';
 
 export enum NumberValue {
   ZERO = '0',
@@ -24,10 +26,28 @@ export enum CleanAction {
   CLEAN_RESULT = 'AC',
 }
 
+type ModifierRepresentation = {
+  [key in MathModifier]: string;
+};
+
+const modifierRepresentation: ModifierRepresentation = {
+  [MathModifier.PERCENT]: '%',
+  [MathModifier.FACTORIAL]: '!',
+  [MathModifier.SIN]: 'sin(',
+  [MathModifier.ASIN]: 'arcsin(',
+  [MathModifier.LN]: 'ln(',
+  [MathModifier.COS]: 'cos(',
+  [MathModifier.ACOS]: 'arccos(',
+  [MathModifier.LOG]: 'log(',
+  [MathModifier.TAN]: 'tan(',
+  [MathModifier.ATAN]: 'arctan(',
+  [MathModifier.SQUARE_ROOT]: '√(',
+  [MathModifier.EXP]: 'E',
+};
+
 const START_NUMBER = '0';
 
 export class CalculationStore {
-  @observable private _expression = '';
   @observable private _result: string | null = null;
 
   private _commands: CommandsStore = new CommandsStore();
@@ -46,45 +66,12 @@ export class CalculationStore {
     return this._result !== null;
   }
 
-  @computed
-  get expression(): string {
-    return this._expression ? this._expression : START_NUMBER;
-  }
-
   @action
   setNumber(value: NumberValue): void {
-    if (value === NumberValue.DOT && this._expression === '') {
-      this._expression += '0.';
-      this._commands.addCommand({
-        type: CommandType.SET_VALUE,
-        value: '0.',
-      });
-      return;
-    }
-
-    if (this._actions.closedParentheses) {
-      this._expression += value;
-      this._commands.addCommands(
-        {
-          type: CommandType.ADD_MATH_OPERATION,
-          operation: MathAction.MULTIPLY,
-        },
-        {
-          type: CommandType.SET_VALUE,
-          value,
-        },
-      );
-      return;
-    }
-
-    const newNumber = this._actions.lastValue + value;
-    if (isNumber(newNumber)) {
-      this._expression += value;
-      this._commands.addCommand({
-        type: CommandType.SET_VALUE,
-        value: newNumber,
-      });
-    }
+    this._commands.send({
+      type: CommandType.ADD_VALUE,
+      value,
+    });
   }
 
   @action
@@ -94,23 +81,24 @@ export class CalculationStore {
     //   return;
     // }
 
-    if (!(this._actions.closedParentheses || isNumber(this._actions.lastValue))) {
-      return;
-    }
+    // if (!(this._actions.closedParentheses || isNumber(this._actions.lastValue))) {
+    //   return;
+    // }
 
-    this._commands.addCommand({
+    this._commands.send({
       type: CommandType.ADD_MATH_OPERATION,
       operation: action,
     });
-    this._expression += action;
+    // this._expression += action;
   }
 
   @action
   addModifier(modifier: MathModifier): void {
-    this._commands.addCommand({
-      type: CommandType.ADD_MODIFIER,
-      modifier,
-    });
+    // this._commands.send({
+    //   type: CommandType.ADD_MODIFIER,
+    //   modifier,
+    // });
+    // this._expression += modifierRepresentation[modifier];
   }
 
   @action
@@ -122,8 +110,8 @@ export class CalculationStore {
 
   @action
   clean(): void {
-    this._commands.removeLastCommand();
-    this._expression = this._expression.slice(0, this._expression.length - 1);
+    // this._commands.removeLastCommand();
+    // this._expression = this._expression.slice(0, this._expression.length - 1);
   }
 
   @action
@@ -136,8 +124,7 @@ export class CalculationStore {
         : {
             type: CommandType.ADD_RIGHT_PARENTHESES,
           };
-    this._commands.addCommand(command);
-    this._expression += parentheses;
+    this._commands.send(command);
   }
 
   @action

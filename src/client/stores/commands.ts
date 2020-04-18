@@ -1,14 +1,14 @@
-import { ActionsStore } from './actions';
 import { CommandType, Command, AddValueCommand, AddMathOperationCommand, AddModifierCommand } from './types';
 
 import { ApplicationService } from './application.service';
 
 export class CommandsStore {
   private _commands: Command[] = [];
-  private _actions: ActionsStore = new ActionsStore();
   private _applicationService = new ApplicationService();
 
-  private _applyCommand(actionsStore: ActionsStore, command: Command): void {
+  private _applyCommand(command: Command): void {
+    this._commands.push(command);
+
     switch (command.type) {
       case CommandType.ADD_VALUE:
         this._applicationService.handleSetValue(command as AddValueCommand);
@@ -29,42 +29,24 @@ export class CommandsStore {
       case CommandType.ADD_MODIFIER:
         this._applicationService.handleAddModifier(command as AddModifierCommand);
         break;
+
+      case CommandType.REMOVE_SYMBOL:
+        this._applicationService.handleRemoveSymbol();
+        break;
+
+      case CommandType.REMOVE_ALL_SYMBOLS:
+        this._applicationService.handleRemoveAllSymbols();
+        break;
+
+      case CommandType.CALCULATE_RESULT:
+        this._applicationService.handleCalculateResult();
+        break;
     }
-  }
-
-  private _addCommand(command: Command): void {
-    this._commands.push(command);
-    this._applyCommand(this._actions, command);
-    console.log(this._actions._rootExpression);
-  }
-
-  get actions(): ActionsStore {
-    return this._actions;
   }
 
   send(...commands: Command[]): void {
     for (const command of commands) {
-      this._addCommand(command);
+      this._applyCommand(command);
     }
-  }
-
-  removeLastCommand(): void {
-    this._commands.pop();
-    this._actions = this.restoreActions();
-  }
-
-  removeAllCommands(): void {
-    this._commands = [];
-    this._actions = this.restoreActions();
-  }
-
-  restoreActions(): ActionsStore {
-    const actionsStore = new ActionsStore();
-
-    for (const command of this._commands) {
-      this._applyCommand(actionsStore, command);
-    }
-
-    return actionsStore;
   }
 }

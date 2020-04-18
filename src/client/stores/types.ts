@@ -3,7 +3,6 @@ export enum MathAction {
   MULTIPLY = '×',
   MINUS = '−',
   PLUS = '+',
-  PERCENT = '%',
 }
 
 export enum MathModifier {
@@ -35,6 +34,16 @@ export enum NumberValue {
   DOT = '.',
 }
 
+export enum Parentheses {
+  LEFT = '(',
+  RIGHT = ')',
+}
+
+export enum CleanAction {
+  CLEAN_ONE = 'CE',
+  CLEAN_RESULT = 'AC',
+}
+
 // Commands
 
 export enum CommandType {
@@ -44,6 +53,8 @@ export enum CommandType {
   ADD_RIGHT_PARENTHESES = 'add-right-parentheses',
   ADD_MODIFIER = 'add-modifier',
   REMOVE_SYMBOL = 'remove-symbol',
+  REMOVE_ALL_SYMBOLS = 'remove-all-symbols',
+  CALCULATE_RESULT = 'calculate-result',
 }
 
 export interface BaseCommand {
@@ -72,6 +83,7 @@ export enum EventType {
   LEFT_PARENTHESES_ADDED = 'left-parentheses-added',
   RIGHT_PARENTHESES_ADDED = 'right-parentheses-added',
   MODIFIER_ADDED = 'modifier-added',
+  RESULT_CALCULATED = 'result-calculated',
 }
 
 export interface BaseEvent {
@@ -87,4 +99,12 @@ export interface OperationAddedEvent extends BaseEvent {
   operation: MathAction;
 }
 
-export type Event = BaseEvent | ValueChangedEvent | OperationAddedEvent;
+export interface ModifierAddedEvent extends BaseEvent {
+  modifier: MathModifier;
+}
+
+export interface ResultCalculatedEvent extends BaseEvent {
+  result: string | null;
+}
+
+export type Event = BaseEvent | ValueChangedEvent | OperationAddedEvent | ModifierAddedEvent | ResultCalculatedEvent;

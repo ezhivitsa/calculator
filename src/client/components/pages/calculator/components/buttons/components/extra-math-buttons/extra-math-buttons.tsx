@@ -2,20 +2,17 @@ import React, { ReactElement, ReactNode } from 'react';
 
 import { Button } from 'components/global/button';
 
-import { Parentheses, MathAction } from 'stores';
-import { useCalculationStore } from 'providers';
+import { Parentheses, MathModifier, calculationStore } from 'stores';
 
 import styles from './extra-math-buttons.pcss';
 
 export function ExtraMathButtons(): ReactElement {
-  const calculation = useCalculationStore();
-
   function handleParenthesesClick(parentheses: Parentheses): void {
-    calculation.addParentheses(parentheses);
+    calculationStore.addParentheses(parentheses);
   }
 
-  function handleActionClick(action: MathAction): void {
-    calculation.addAction(action);
+  function handleModifierClick(modifier: MathModifier): void {
+    calculationStore.addModifier(modifier);
   }
 
   const buttons = [
@@ -28,8 +25,8 @@ export function ExtraMathButtons(): ReactElement {
       onClick: () => handleParenthesesClick(Parentheses.RIGHT),
     },
     {
-      title: MathAction.PERCENT,
-      onClick: () => handleActionClick(MathAction.PERCENT),
+      title: MathModifier.PERCENT,
+      onClick: () => handleModifierClick(MathModifier.PERCENT),
     },
   ];
 

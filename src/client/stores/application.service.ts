@@ -6,6 +6,8 @@ import {
   EventType,
   ValueChangedEvent,
   OperationAddedEvent,
+  ModifierAddedEvent,
+  ResultCalculatedEvent,
 } from './types';
 
 import { ApplicationState } from './application.state';
@@ -18,8 +20,10 @@ export class ApplicationService {
 
   private _applicationState = new ApplicationState();
 
-  private _apply(event: Event): void {
-    this._events.push(event);
+  private _apply(event: Event, shouldAdd = true): void {
+    if (shouldAdd) {
+      this._events.push(event);
+    }
 
     switch (event.type) {
       case EventType.VALUE_CHANGED:
@@ -39,6 +43,34 @@ export class ApplicationService {
         actionsStore.handleLeftParenthesesAdded();
         presentationStore.handleLeftParenthesesAdded();
         break;
+
+      case EventType.RIGHT_PARENTHESES_ADDED:
+        this._applicationState.handleRightParenthesesAdded();
+        actionsStore.handleRightParenthesesAdded();
+        presentationStore.handleRightParenthesesAdded();
+        break;
+
+      case EventType.MODIFIER_ADDED:
+        this._applicationState.handleModifierAdded(event as ModifierAddedEvent);
+        actionsStore.handleModifierAdded(event as ModifierAddedEvent);
+        presentationStore.handleModifierAdded(event as ModifierAddedEvent);
+        break;
+
+      case EventType.RESULT_CALCULATED:
+        presentationStore.handleResultCalculated(event as ResultCalculatedEvent);
+        break;
+    }
+  }
+
+  private _dispose(): void {
+    this._applicationState.dispose();
+    actionsStore.dispose();
+    presentationStore.dispose();
+  }
+
+  private _restore(): void {
+    for (const event of this._events) {
+      this._apply(event, false);
     }
   }
 
@@ -59,8 +91,8 @@ export class ApplicationService {
     if (this._applicationState.canAddSign(command.operation)) {
       this._apply({
         type: EventType.VALUE_CHANGED,
-        addedValue: command.operation,
-        value: command.operation,
+        addedValue: '-',
+        value: '-',
       });
       return;
     }
@@ -79,7 +111,43 @@ export class ApplicationService {
     });
   }
 
-  handleAddRightParentheses(): void {}
+  handleAddRightParentheses(): void {
+    if (!this._applicationState.canAddRightParentheses()) {
+      return;
+    }
 
-  handleAddModifier(command: AddModifierCommand): void {}
+    this._apply({
+      type: EventType.RIGHT_PARENTHESES_ADDED,
+    });
+  }
+
+  handleRemoveSymbol(): void {
+    if (!this._events.length) {
+      return;
+    }
+
+    this._events.pop();
+
+    this._dispose();
+    this._restore();
+  }
+
+  handleRemoveAllSymbols(): void {
+    this._dispose();
+  }
+
+  handleAddModifier(command: AddModifierCommand): void {
+    this._apply({
+      type: EventType.MODIFIER_ADDED,
+      modifier: command.modifier,
+    });
+  }
+
+  async handleCalculateResult(): Promise<void> {
+    const result = await actionsStore.calculateResult();
+    this._apply({
+      type: EventType.RESULT_CALCULATED,
+      result,
+    });
+  }
 }

@@ -4,8 +4,8 @@ import classnames from 'classnames';
 
 import { Button } from 'components/global/button';
 
-import { MathAction, CleanAction } from 'stores';
-import { useCalculationStore } from 'providers';
+import { MathAction, CleanAction, calculationStore } from 'stores';
+import { usePresentationStore } from 'providers';
 
 import { LONG_PRESS_TIMEOUT } from 'constants/app';
 
@@ -15,7 +15,7 @@ const buttons: MathAction[] = [MathAction.DIVIDE, MathAction.MULTIPLY, MathActio
 
 export const MathButtons = observer(
   (): ReactElement => {
-    const calculationStore = useCalculationStore();
+    const presentationStore = usePresentationStore();
     let timeout: number | null = null;
 
     function handleButtonClick(action: MathAction): void {
@@ -41,7 +41,7 @@ export const MathButtons = observer(
       clearTimeout(timeout);
       timeout = null;
 
-      if (!calculationStore.showResult) {
+      if (!presentationStore.showResult) {
         calculationStore.clean();
       } else {
         calculationStore.cleanAll();
@@ -49,7 +49,7 @@ export const MathButtons = observer(
     }
 
     function renderCleanButton(): ReactNode {
-      const text = calculationStore.showResult ? CleanAction.CLEAN_RESULT : CleanAction.CLEAN_ONE;
+      const text = presentationStore.showResult ? CleanAction.CLEAN_RESULT : CleanAction.CLEAN_ONE;
       return (
         <Button
           className={classnames(styles.mathButtons__btn, styles._clean)}

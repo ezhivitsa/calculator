@@ -1,3 +1,4 @@
 export { CalculatorStore } from './calculator';
-export { CalculationStore, NumberValue, CleanAction } from './calculation';
-export { MathAction, Parentheses, MathModifier } from './actions';
+export { CalculationStore, calculationStore } from './calculation';
+export { MathModifier } from './actions';
+export { MathAction, CleanAction, NumberValue, Parentheses } from './types';

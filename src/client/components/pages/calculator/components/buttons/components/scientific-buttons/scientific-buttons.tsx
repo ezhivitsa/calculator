@@ -1,7 +1,6 @@
 import React, { useState, ReactElement, ReactNode } from 'react';
 
-import { MathModifier } from 'stores';
-import { useCalculationStore } from 'providers';
+import { MathModifier, calculationStore } from 'stores';
 
 import { buttonTexts } from 'texts/buttons';
 
@@ -17,10 +16,10 @@ interface Button {
 
 export function ScientificButtons(): ReactElement {
   const [showInverse, setShowInverse] = useState(false);
-  const calculationStore = useCalculationStore();
 
   function handleModifierClick(modifier: MathModifier): void {
     calculationStore.addModifier(modifier);
+    setShowInverse(false);
   }
 
   function handleInverseClick(): void {

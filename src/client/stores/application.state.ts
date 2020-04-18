@@ -1,6 +1,7 @@
 import { isNumber } from 'lib/numbers';
 
-import { ValueChangedEvent, NumberValue, MathAction, OperationAddedEvent } from './types';
+import { ValueChangedEvent, NumberValue, MathAction, OperationAddedEvent, ModifierAddedEvent } from './types';
+import { PREFIX_MODIFIER } from './constants';
 
 const START_VALUE = '0';
 
@@ -28,10 +29,33 @@ export class ApplicationState {
 
   handleLeftParenthesesAdded(): void {
     this._numOpenedParentheses += 1;
+    this._currentValue = '';
+    this._hasMinusSign = false;
+    this._hasValues = true;
+    this._currentAction = null;
+  }
+
+  handleRightParenthesesAdded(): void {
+    this._numOpenedParentheses -= 1;
+  }
+
+  handleModifierAdded(event: ModifierAddedEvent): void {
+    this._hasValues = true;
+    this._currentValue = '';
+    this._hasMinusSign = false;
+    this._currentAction = null;
+
+    if (PREFIX_MODIFIER.includes(event.modifier)) {
+      this._numOpenedParentheses += 1;
+    }
   }
 
   newValue(value: string): string | null {
-    const newValue = !this._hasValues && value !== NumberValue.DOT ? value : `${START_VALUE}.`;
+    const newValue =
+      !this._hasValues && !this._currentValue && value === NumberValue.DOT
+        ? `${START_VALUE}.`
+        : `${this._currentValue}${value}`;
+
     if (!isNumber(newValue)) {
       return null;
     }
@@ -44,10 +68,7 @@ export class ApplicationState {
       return false;
     }
 
-    if (
-      (!this._hasValues && !this._currentValue) ||
-      (this._hasValues && this._currentAction !== null && !this._currentValue)
-    ) {
+    if (!this._currentValue) {
       return true;
     }
 
@@ -56,5 +77,20 @@ export class ApplicationState {
 
   canAddOperation(): boolean {
     return isNumber(this._currentValue);
+  }
+
+  canAddRightParentheses(): boolean {
+    return (
+      this._numOpenedParentheses > 0 &&
+      (this._currentAction === null || (this._currentAction !== null && isNumber(this._currentValue)))
+    );
+  }
+
+  dispose(): void {
+    this._currentValue = '';
+    this._hasMinusSign = false;
+    this._hasValues = false;
+    this._currentAction = null;
+    this._numOpenedParentheses = 0;
   }
 }

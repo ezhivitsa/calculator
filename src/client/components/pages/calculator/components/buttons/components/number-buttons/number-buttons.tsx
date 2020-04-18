@@ -2,8 +2,7 @@ import React, { ReactElement, ReactNode } from 'react';
 
 import { Button } from 'components/global/button';
 
-import { NumberValue } from 'stores';
-import { useCalculationStore } from 'providers';
+import { NumberValue, calculationStore } from 'stores';
 
 import styles from './number-buttons.pcss';
 
@@ -22,8 +21,6 @@ const buttons: NumberValue[] = [
 ];
 
 export function NumberButtons(): ReactElement {
-  const calculationStore = useCalculationStore();
-
   function handleResultClick(): void {
     calculationStore.calculateResult();
   }

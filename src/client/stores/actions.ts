@@ -1,19 +1,6 @@
 import { CalculatorAdapter } from 'adapters/calculator';
 
-import { ValueChangedEvent, OperationAddedEvent } from './types';
-
-export enum Parentheses {
-  LEFT = '(',
-  RIGHT = ')',
-}
-
-export enum MathAction {
-  DIVIDE = '÷',
-  MULTIPLY = '×',
-  MINUS = '−',
-  PLUS = '+',
-  PERCENT = '%',
-}
+import { ValueChangedEvent, OperationAddedEvent, MathAction, ModifierAddedEvent } from './types';
 
 export enum MathModifier {
   PERCENT = '%',
@@ -215,9 +202,8 @@ export class ActionsStore {
       return;
     }
 
-    //this.handleOperationAdded(MathAction.MULTIPLY);
-    this.addModifier(modifier);
-    return;
+    this._addActionForBinaryExpression(currentExpression, MathAction.MULTIPLY);
+    this._addPrefixModifierForBinaryExpression(this._expression as BinaryExpression, modifier);
   }
 
   private _addPrefixModifierForSingleExpression(currentExpression: SingleExpression, modifier: MathModifier): void {
@@ -235,8 +221,8 @@ export class ActionsStore {
       return;
     }
 
-    //this.handleOperationAdded(MathAction.MULTIPLY);
-    this.addModifier(modifier);
+    this._addActionForSingleExpression(currentExpression, MathAction.MULTIPLY);
+    this._addPrefixModifierForBinaryExpression(this._expression as BinaryExpression, modifier);
   }
 
   private _addPostfixModifierForBinaryExpression(currentExpression: BinaryExpression, modifier: MathModifier): void {}
@@ -396,7 +382,31 @@ export class ActionsStore {
     }
   }
 
-  addModifier(modifier: MathModifier): void {
+  handleRightParenthesesAdded(): void {
+    const { parent } = this._expression;
+    if (!parent) {
+      return;
+    }
+
+    if (instanceofBinaryExpression(this._expression)) {
+      const { left, operation, right } = this._expression;
+
+      if (!left || (operation && !right)) {
+        return;
+      }
+    }
+
+    if (instanceofSingleExpression(this._expression)) {
+      const { value } = this._expression;
+      if (!value) {
+        return;
+      }
+    }
+
+    this._expression = parent;
+  }
+
+  handleModifierAdded({ modifier }: ModifierAddedEvent): void {
     if (PREFIX_MODIFIER.includes(modifier)) {
       if (instanceofBinaryExpression(this._expression)) {
         return this._addPrefixModifierForBinaryExpression(this._expression, modifier);
@@ -418,6 +428,16 @@ export class ActionsStore {
 
   calculateResult(): Promise<string | null> {
     return this._calculateExpression(this._rootExpression);
+  }
+
+  dispose(): void {
+    this._rootExpression = {
+      left: '',
+      operation: null,
+      right: '',
+      parent: null,
+    };
+    this._expression = this._rootExpression;
   }
 }
 

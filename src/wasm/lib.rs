@@ -1,4 +1,6 @@
 use std::str::FromStr;
+use std::f64::consts::PI;
+use std::f64::consts::E;
 
 use wasm_bindgen::prelude::*;
 
@@ -21,7 +23,18 @@ pub fn main_js() -> Result<(), JsValue> {
     Ok(())
 }
 
+static PI_STR: &str = "pi";
+static E_STR: &str = "e";
+
 fn parse_float(value: &str) -> f64 {
+    if value == PI_STR {
+        return PI;
+    }
+
+    if value == E_STR {
+        return E;
+    }
+
     let result = f64::from_str(value);
     match result {
         Ok(num) => {
@@ -70,10 +83,89 @@ pub fn multiply(value1: &str, value2: &str) -> String {
 }
 
 #[wasm_bindgen]
-pub fn arccos(value: &str) -> String {
+pub fn calc_cos(value: &str) -> String {
+    let num = parse_float(value);
+
+    let result = num.cos();
+    result.to_string()
+}
+
+#[wasm_bindgen]
+pub fn calc_arccos(value: &str) -> String {
     let num = parse_float(value);
 
     let result = num.acos();
+    if result.is_nan() {
+        return "".to_string();
+    }
+    result.to_string()
+}
+
+#[wasm_bindgen]
+pub fn calc_sin(value: &str) -> String {
+    let num = parse_float(value);
+
+    let result = num.sin();
+    result.to_string()
+}
+
+#[wasm_bindgen]
+pub fn calc_arcsin(value: &str) -> String {
+    let num = parse_float(value);
+
+    let result = num.asin();
+    if result.is_nan() {
+        return "".to_string();
+    }
+    result.to_string()
+}
+
+#[wasm_bindgen]
+pub fn calc_ln(value: &str) -> String {
+    let num = parse_float(value);
+
+    let result = num.ln();
+    if result.is_nan() {
+        return "".to_string();
+    }
+    result.to_string()
+}
+
+#[wasm_bindgen]
+pub fn calc_log(value: &str) -> String {
+    let num = parse_float(value);
+
+    let result = num.log10();
+    if result.is_nan() {
+        return "".to_string();
+    }
+    result.to_string()
+}
+
+#[wasm_bindgen]
+pub fn calc_tan(value: &str) -> String {
+    let num = parse_float(value);
+
+    let result = num.tan();
+    if result.is_nan() {
+        return "".to_string();
+    }
+    result.to_string()
+}
+
+#[wasm_bindgen]
+pub fn calc_arctan(value: &str) -> String {
+    let num = parse_float(value);
+
+    let result = num.atan();
+    result.to_string()
+}
+
+#[wasm_bindgen]
+pub fn calc_sqrt(value: &str) -> String {
+    let num = parse_float(value);
+
+    let result = num.sqrt();
     if result.is_nan() {
         return "".to_string();
     }

@@ -1,21 +1,14 @@
 import { CalculatorAdapter } from 'adapters/calculator';
 
-import { ValueChangedEvent, OperationAddedEvent, MathAction, ModifierAddedEvent } from './types';
-
-export enum MathModifier {
-  PERCENT = '%',
-  FACTORIAL = 'factorial',
-  SIN = 'sin',
-  ASIN = 'asin',
-  LN = 'ln',
-  COS = 'cos',
-  ACOS = 'acos',
-  LOG = 'log',
-  TAN = 'tan',
-  ATAN = 'atan',
-  SQUARE_ROOT = 'square-root',
-  EXP = 'exp',
-}
+import {
+  ValueChangedEvent,
+  OperationAddedEvent,
+  MathAction,
+  ModifierAddedEvent,
+  MathModifier,
+  MathConstantAddedEvent,
+} from './types';
+import { PREFIX_MODIFIERS } from './constants';
 
 type Expression = BinaryExpression | SingleExpression;
 
@@ -35,19 +28,6 @@ interface BinaryExpression {
 }
 
 const PRIORITY_ACTIONS = [MathAction.MULTIPLY, MathAction.DIVIDE];
-
-const PREFIX_MODIFIER = [
-  MathModifier.SIN,
-  MathModifier.ASIN,
-  MathModifier.LN,
-  MathModifier.COS,
-  MathModifier.ACOS,
-  MathModifier.LOG,
-  MathModifier.TAN,
-  MathModifier.ATAN,
-  MathModifier.SQUARE_ROOT,
-  MathModifier.EXP,
-];
 
 function instanceofBinaryExpression(object: Expression): object is BinaryExpression {
   return 'left' in object && 'right' in object;
@@ -86,7 +66,7 @@ export class ActionsStore {
     const rightValue = await this._getValue(right);
 
     if (leftValue && !operation && !rightValue) {
-      return leftValue;
+      return this._calculator.add(leftValue, '0');
     }
 
     if (!(leftValue && rightValue && operation)) {
@@ -119,10 +99,34 @@ export class ActionsStore {
       return null;
     }
 
-    console.log(valueString);
     switch (modifier) {
+      case MathModifier.COS:
+        return this._calculator.cos(valueString);
+
       case MathModifier.ACOS:
         return this._calculator.acos(valueString);
+
+      case MathModifier.SIN:
+        return this._calculator.sin(valueString);
+
+      case MathModifier.ASIN:
+        return this._calculator.asin(valueString);
+
+      case MathModifier.LN:
+        return this._calculator.ln(valueString);
+
+      case MathModifier.LOG:
+        return this._calculator.log(valueString);
+
+      case MathModifier.TAN:
+        return this._calculator.tan(valueString);
+
+      case MathModifier.ATAN:
+        return this._calculator.atan(valueString);
+
+      case MathModifier.SQUARE_ROOT:
+        return this._calculator.sqrt(valueString);
+
       default:
         return null;
     }
@@ -294,6 +298,39 @@ export class ActionsStore {
     this._expression = expression;
   }
 
+  private _addMathConstantForBinaryExpression(currentExpression: BinaryExpression, value: string): void {
+    const { left, operation, right } = currentExpression;
+    if (!left) {
+      currentExpression.left = value;
+      return;
+    }
+
+    if (!operation) {
+      currentExpression.operation = MathAction.MULTIPLY;
+      currentExpression.right = value;
+      return;
+    }
+
+    if (!right) {
+      currentExpression.right = value;
+      return;
+    }
+
+    this._addActionForBinaryExpression(currentExpression, MathAction.MULTIPLY);
+    currentExpression.right = value;
+    return;
+  }
+
+  private _addMathConstantForSingleExpression(currentExpression: SingleExpression, value: string): void {
+    if (!currentExpression.value) {
+      currentExpression.value = value;
+      return;
+    }
+
+    this._addActionForSingleExpression(currentExpression, MathAction.MULTIPLY);
+    (this._expression as BinaryExpression).right = value;
+  }
+
   addRightParentheses(): void {
     const { parent } = this._expression;
     if (!parent) {
@@ -407,7 +444,7 @@ export class ActionsStore {
   }
 
   handleModifierAdded({ modifier }: ModifierAddedEvent): void {
-    if (PREFIX_MODIFIER.includes(modifier)) {
+    if (PREFIX_MODIFIERS.includes(modifier)) {
       if (instanceofBinaryExpression(this._expression)) {
         return this._addPrefixModifierForBinaryExpression(this._expression, modifier);
       }
@@ -423,6 +460,18 @@ export class ActionsStore {
       if (instanceofSingleExpression(this._expression)) {
         return this._addPostfixModifierForSingleExpression(this._expression, modifier);
       }
+    }
+  }
+
+  handleMathConstantAdded({ constant, value }: MathConstantAddedEvent): void {
+    const valueToSet = value || constant;
+
+    if (instanceofBinaryExpression(this._expression)) {
+      this._addMathConstantForBinaryExpression(this._expression, valueToSet);
+    }
+
+    if (instanceofSingleExpression(this._expression)) {
+      this._addMathConstantForSingleExpression(this._expression, valueToSet);
     }
   }
 

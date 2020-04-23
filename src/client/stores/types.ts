@@ -44,6 +44,18 @@ export enum CleanAction {
   CLEAN_RESULT = 'AC',
 }
 
+export enum MathConstant {
+  PI = 'pi',
+  E = 'e',
+  ANSWER = 'Ans',
+  RANDOM = 'Rnd',
+}
+
+export type ExpressionValue = {
+  value: string;
+  bold: boolean;
+};
+
 // Commands
 
 export enum CommandType {
@@ -55,6 +67,7 @@ export enum CommandType {
   REMOVE_SYMBOL = 'remove-symbol',
   REMOVE_ALL_SYMBOLS = 'remove-all-symbols',
   CALCULATE_RESULT = 'calculate-result',
+  ADD_MATH_CONSTANT = 'add-math-constant',
 }
 
 export interface BaseCommand {
@@ -73,7 +86,11 @@ export interface AddModifierCommand extends BaseCommand {
   modifier: MathModifier;
 }
 
-export type Command = BaseCommand | AddValueCommand | AddMathOperationCommand | AddModifierCommand;
+export interface AddConstantCommand extends BaseCommand {
+  constant: MathConstant;
+}
+
+export type Command = BaseCommand | AddValueCommand | AddMathOperationCommand | AddModifierCommand | AddConstantCommand;
 
 // Events
 
@@ -84,6 +101,8 @@ export enum EventType {
   RIGHT_PARENTHESES_ADDED = 'right-parentheses-added',
   MODIFIER_ADDED = 'modifier-added',
   RESULT_CALCULATED = 'result-calculated',
+  RESULT_CLEARED = 'result-cleared',
+  MATH_CONSTANT_ADDED = 'math-constant-added',
 }
 
 export interface BaseEvent {
@@ -105,6 +124,19 @@ export interface ModifierAddedEvent extends BaseEvent {
 
 export interface ResultCalculatedEvent extends BaseEvent {
   result: string | null;
+  expression: ExpressionValue[];
+  events: Event[];
 }
 
-export type Event = BaseEvent | ValueChangedEvent | OperationAddedEvent | ModifierAddedEvent | ResultCalculatedEvent;
+export interface MathConstantAddedEvent extends BaseEvent {
+  constant: MathConstant;
+  value?: string;
+}
+
+export type Event =
+  | BaseEvent
+  | ValueChangedEvent
+  | OperationAddedEvent
+  | ModifierAddedEvent
+  | ResultCalculatedEvent
+  | MathConstantAddedEvent;

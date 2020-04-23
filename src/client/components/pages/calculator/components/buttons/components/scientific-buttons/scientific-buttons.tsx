@@ -1,6 +1,6 @@
 import React, { useState, ReactElement, ReactNode } from 'react';
 
-import { MathModifier, calculationStore } from 'stores';
+import { MathModifier, MathConstant, calculationStore } from 'stores';
 
 import { buttonTexts } from 'texts/buttons';
 
@@ -20,6 +20,10 @@ export function ScientificButtons(): ReactElement {
   function handleModifierClick(modifier: MathModifier): void {
     calculationStore.addModifier(modifier);
     setShowInverse(false);
+  }
+
+  function handleConstantClick(constant: MathConstant): void {
+    calculationStore.addConstant(constant);
   }
 
   function handleInverseClick(): void {
@@ -64,6 +68,7 @@ export function ScientificButtons(): ReactElement {
     {
       title: buttonTexts.pi,
       inverse: null,
+      onClick: () => handleConstantClick(MathConstant.PI),
     },
     {
       title: buttonTexts.cosine,
@@ -97,6 +102,7 @@ export function ScientificButtons(): ReactElement {
     {
       title: buttonTexts.e,
       inverse: null,
+      onClick: () => handleConstantClick(MathConstant.E),
     },
     {
       title: buttonTexts.tangent,
@@ -130,10 +136,12 @@ export function ScientificButtons(): ReactElement {
     {
       title: buttonTexts.ans,
       inverse: false,
+      onClick: () => handleConstantClick(MathConstant.ANSWER),
     },
     {
       title: buttonTexts.rnd,
       inverse: true,
+      onClick: () => handleConstantClick(MathConstant.RANDOM),
     },
     {
       title: buttonTexts.exp,

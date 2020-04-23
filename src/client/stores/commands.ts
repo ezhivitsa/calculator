@@ -1,4 +1,11 @@
-import { CommandType, Command, AddValueCommand, AddMathOperationCommand, AddModifierCommand } from './types';
+import {
+  CommandType,
+  Command,
+  AddValueCommand,
+  AddMathOperationCommand,
+  AddModifierCommand,
+  AddConstantCommand,
+} from './types';
 
 import { ApplicationService } from './application.service';
 
@@ -40,6 +47,10 @@ export class CommandsStore {
 
       case CommandType.CALCULATE_RESULT:
         this._applicationService.handleCalculateResult();
+        break;
+
+      case CommandType.ADD_MATH_CONSTANT:
+        this._applicationService.handleAddMathConstant(command as AddConstantCommand);
         break;
     }
   }

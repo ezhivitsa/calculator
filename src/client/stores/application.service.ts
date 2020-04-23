@@ -2,18 +2,23 @@ import {
   AddMathOperationCommand,
   AddModifierCommand,
   AddValueCommand,
+  AddConstantCommand,
   Event,
   EventType,
   ValueChangedEvent,
   OperationAddedEvent,
   ModifierAddedEvent,
   ResultCalculatedEvent,
+  MathConstant,
+  MathAction,
+  MathConstantAddedEvent,
 } from './types';
 
 import { ApplicationState } from './application.state';
 
 import { actionsStore } from './actions';
 import { presentationStore } from './presentation';
+import { historyStory } from './history';
 
 export class ApplicationService {
   private _events: Event[] = [];
@@ -58,6 +63,17 @@ export class ApplicationService {
 
       case EventType.RESULT_CALCULATED:
         presentationStore.handleResultCalculated(event as ResultCalculatedEvent);
+        historyStory.handleResultCalculated(event as ResultCalculatedEvent);
+        break;
+
+      case EventType.MATH_CONSTANT_ADDED:
+        this._applicationState.handleMathConstantAdded();
+        actionsStore.handleMathConstantAdded(event as MathConstantAddedEvent);
+        presentationStore.handleMathConstantAdded(event as MathConstantAddedEvent);
+        break;
+
+      case EventType.RESULT_CLEARED:
+        presentationStore.handleResultCleared();
         break;
     }
   }
@@ -75,6 +91,23 @@ export class ApplicationService {
   }
 
   handleSetValue(command: AddValueCommand): void {
+    if (this._applicationState.shouldAddMultiplyForConstant()) {
+      if (!this._applicationState.isNumber(command.value)) {
+        return;
+      }
+
+      this._apply({
+        type: EventType.MATH_OPERATION_ADDED,
+        operation: MathAction.MULTIPLY,
+      });
+      this._apply({
+        type: EventType.VALUE_CHANGED,
+        addedValue: command.value,
+        value: command.value,
+      });
+      return;
+    }
+
     const newValue = this._applicationState.newValue(command.value);
     if (!newValue) {
       return;
@@ -134,6 +167,10 @@ export class ApplicationService {
 
   handleRemoveAllSymbols(): void {
     this._dispose();
+
+    this._apply({
+      type: EventType.RESULT_CLEARED,
+    });
   }
 
   handleAddModifier(command: AddModifierCommand): void {
@@ -143,11 +180,53 @@ export class ApplicationService {
     });
   }
 
+  handleAddMathConstant(command: AddConstantCommand): void {
+    if (this._applicationState.shouldAddMultiplyForConstant()) {
+      this._apply({
+        type: EventType.MATH_OPERATION_ADDED,
+        operation: MathAction.MULTIPLY,
+      });
+    }
+
+    if (command.constant === MathConstant.RANDOM) {
+      const value = Math.random().toString();
+
+      this._apply({
+        type: EventType.MATH_CONSTANT_ADDED,
+        constant: MathConstant.RANDOM,
+        value,
+      });
+      return;
+    }
+
+    if (command.constant === MathConstant.ANSWER) {
+      const value = historyStory.lastNumericResult;
+
+      if (value) {
+        this._apply({
+          type: EventType.MATH_CONSTANT_ADDED,
+          constant: MathConstant.ANSWER,
+          value,
+        });
+      }
+      return;
+    }
+
+    this._apply({
+      type: EventType.MATH_CONSTANT_ADDED,
+      constant: command.constant,
+    });
+  }
+
   async handleCalculateResult(): Promise<void> {
     const result = await actionsStore.calculateResult();
+    const { expression } = presentationStore;
+
     this._apply({
       type: EventType.RESULT_CALCULATED,
       result,
+      expression,
+      events: [...this._events],
     });
   }
 }

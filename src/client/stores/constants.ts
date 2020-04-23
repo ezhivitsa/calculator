@@ -1,6 +1,6 @@
 import { MathModifier } from './types';
 
-export const PREFIX_MODIFIER = [
+export const PREFIX_MODIFIERS = [
   MathModifier.SIN,
   MathModifier.ASIN,
   MathModifier.LN,
@@ -10,5 +10,4 @@ export const PREFIX_MODIFIER = [
   MathModifier.TAN,
   MathModifier.ATAN,
   MathModifier.SQUARE_ROOT,
-  MathModifier.EXP,
 ];

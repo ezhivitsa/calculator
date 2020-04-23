@@ -1,7 +1,6 @@
-import { MathModifier } from './actions';
 import { CommandsStore } from './commands';
 
-import { CommandType, Command, MathAction, Parentheses, NumberValue } from './types';
+import { CommandType, Command, MathAction, Parentheses, NumberValue, MathConstant, MathModifier } from './types';
 
 export class CalculationStore {
   private _commands: CommandsStore = new CommandsStore();
@@ -24,6 +23,13 @@ export class CalculationStore {
     this._commands.send({
       type: CommandType.ADD_MODIFIER,
       modifier,
+    });
+  }
+
+  addConstant(constant: MathConstant): void {
+    this._commands.send({
+      type: CommandType.ADD_MATH_CONSTANT,
+      constant,
     });
   }
 

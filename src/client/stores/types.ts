@@ -92,6 +92,18 @@ export interface AddConstantCommand extends BaseCommand {
 
 export type Command = BaseCommand | AddValueCommand | AddMathOperationCommand | AddModifierCommand | AddConstantCommand;
 
+export type CommandTypeMapping = {
+  [CommandType.ADD_VALUE]: AddValueCommand;
+  [CommandType.ADD_MATH_OPERATION]: AddMathOperationCommand;
+  [CommandType.ADD_LEFT_PARENTHESES]: BaseCommand;
+  [CommandType.ADD_RIGHT_PARENTHESES]: BaseCommand;
+  [CommandType.ADD_MODIFIER]: AddModifierCommand;
+  [CommandType.REMOVE_SYMBOL]: BaseCommand;
+  [CommandType.REMOVE_ALL_SYMBOLS]: BaseCommand;
+  [CommandType.CALCULATE_RESULT]: BaseCommand;
+  [CommandType.ADD_MATH_CONSTANT]: AddConstantCommand;
+};
+
 // Events
 
 export enum EventType {
@@ -101,7 +113,6 @@ export enum EventType {
   RIGHT_PARENTHESES_ADDED = 'right-parentheses-added',
   MODIFIER_ADDED = 'modifier-added',
   RESULT_CALCULATED = 'result-calculated',
-  RESULT_CLEARED = 'result-cleared',
   MATH_CONSTANT_ADDED = 'math-constant-added',
 }
 
@@ -140,3 +151,13 @@ export type Event =
   | ModifierAddedEvent
   | ResultCalculatedEvent
   | MathConstantAddedEvent;
+
+export type EventTypeMapping = {
+  [EventType.VALUE_CHANGED]: ValueChangedEvent;
+  [EventType.MATH_OPERATION_ADDED]: OperationAddedEvent;
+  [EventType.LEFT_PARENTHESES_ADDED]: BaseEvent;
+  [EventType.RIGHT_PARENTHESES_ADDED]: BaseEvent;
+  [EventType.MODIFIER_ADDED]: ModifierAddedEvent;
+  [EventType.RESULT_CALCULATED]: ResultCalculatedEvent;
+  [EventType.MATH_CONSTANT_ADDED]: MathConstantAddedEvent;
+};

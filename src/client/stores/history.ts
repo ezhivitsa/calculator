@@ -1,10 +1,10 @@
 import { Event, ResultCalculatedEvent, ExpressionValue } from './types';
 
-interface CalculationHistory {
-  expression: ExpressionValue[];
-  result: string | null;
-  events: Event[];
-}
+// interface CalculationHistory {
+//   expression: ExpressionValue[];
+//   result: string | null;
+//   events: Event[];
+// }
 
 export class HistoryStore {
   private _history: CalculationHistory[] = [];
@@ -27,6 +27,34 @@ export class HistoryStore {
       events,
     });
   }
+}
+
+class CalculationHistory {
+  private _expression: ExpressionValue[];
+  private _result: string | null;
+  private _events: Event[];
+
+  constructor(expression: ExpressionValue[], result: string | null, events: Event[]) {
+    this._expression = expression;
+    this._result = result;
+    this._events = events;
+  }
+
+  get expression(): ExpressionValue[] {
+    return this._expression;
+  }
+
+  get result(): string | null {
+    return this._result;
+  }
+
+  get events(): Event[] {
+    return this._events;
+  }
+
+  setExpressionAsCurrent(): void {}
+
+  setResultAsCurrent(): void {}
 }
 
 export const historyStory = new HistoryStore();

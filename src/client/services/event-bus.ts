@@ -1,4 +1,4 @@
-import { EventType, EventTypeMapping } from 'stores/types';
+import { EventType, EventTypeMapping } from './types';
 
 import { addEvent, getEvents } from './event-store';
 
@@ -7,6 +7,7 @@ type Handlers = {
 };
 
 const handlers: Handlers = {
+  [EventType.INITIALIZED]: [],
   [EventType.VALUE_CHANGED]: [],
   [EventType.MATH_OPERATION_ADDED]: [],
   [EventType.LEFT_PARENTHESES_ADDED]: [],

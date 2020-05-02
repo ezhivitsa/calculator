@@ -1,4 +1,4 @@
-import { CommandType, Command, CommandTypeMapping } from 'stores/types';
+import { CommandType, Command, CommandTypeMapping } from './types';
 
 type Handlers = {
   [key in CommandType]: ((command: CommandTypeMapping[key]) => void)[];
@@ -15,6 +15,7 @@ const handlers: Handlers = {
   [CommandType.REMOVE_ALL_SYMBOLS]: [],
   [CommandType.CALCULATE_RESULT]: [],
   [CommandType.ADD_MATH_CONSTANT]: [],
+  [CommandType.INIT]: [],
 };
 
 function processCommand<T extends CommandType>(command: CommandTypeMapping[T]): void {

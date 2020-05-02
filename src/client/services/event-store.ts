@@ -1,4 +1,4 @@
-import { Event } from 'stores/types';
+import { Event, EventType } from './types';
 
 const events: Event[] = [];
 
@@ -11,11 +11,11 @@ export function getEvents(): Event[] {
 }
 
 export function removeAllEvents(): void {
-  events.splice(0, events.length);
+  events.splice(1, events.length - 1);
 }
 
 export function removeLastEvent(): void {
-  if (events.length) {
+  if (events.length && events[events.length - 1].type !== EventType.INITIALIZED) {
     events.pop();
   }
 }

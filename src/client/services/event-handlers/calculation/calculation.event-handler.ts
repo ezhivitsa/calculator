@@ -7,9 +7,13 @@ import {
   ModifierAddedEvent,
   ResultCalculatedEvent,
   ValueChangedEvent,
-} from 'stores/types';
+} from 'services/types';
 
-import { addLeftParentheses, addRightParentheses, addOperation, setValue } from './calculation.store';
+import { addLeftParentheses, addRightParentheses, addOperation, setValue, clean } from './calculation.store';
+
+handle(EventType.INITIALIZED, (): void => {
+  clean();
+});
 
 handle(EventType.LEFT_PARENTHESES_ADDED, (): void => {
   addLeftParentheses();

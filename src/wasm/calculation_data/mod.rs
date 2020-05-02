@@ -258,12 +258,11 @@ impl CalculationData {
   }
 
   pub fn clean(&mut self) {
-    let expression = Node::new();
-    let expression_ref = Rc::new(RefCell::new(expression));
+    let expression = Rc::new(RefCell::new(Node::new()));
 
-    let expressions_stack = vec![expression_ref.clone()];
+    self.expressions_stack.clear();
 
-    self.expression = expression_ref;
-    self.expressions_stack = expressions_stack;
+    self.expression = expression.clone();
+    self.expressions_stack.push(expression.clone());
   }
 }

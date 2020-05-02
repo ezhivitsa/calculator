@@ -1,6 +1,7 @@
-import { Event, ResultCalculatedEvent, ExpressionValue, EventType } from './types';
-
 import { handle } from 'services/event-bus';
+
+import { Event, ResultCalculatedEvent, EventType } from 'services/types';
+import { ExpressionValue } from './types';
 
 class CalculationHistory {
   private _expression: ExpressionValue[];

@@ -1,1 +1,1 @@
-export { PresentationStoreProvider, usePresentationStore, presentationStore } from './presentation-provider';
+export { PresentationStoreProvider, usePresentationStore } from './presentation-provider';

@@ -1,13 +1,7 @@
 import { isNumber } from 'lib/numbers';
 
-import {
-  ValueChangedEvent,
-  NumberValue,
-  MathOperation,
-  OperationAddedEvent,
-  ModifierAddedEvent,
-  EventType,
-} from 'stores/types';
+import { NumberValue, MathOperation } from 'stores/types';
+import { ValueChangedEvent, OperationAddedEvent, ModifierAddedEvent, EventType } from 'services/types';
 import { PREFIX_MODIFIERS } from 'stores/constants';
 
 import { handle } from 'services/event-bus';
@@ -41,6 +35,14 @@ const stateData: StateData = {
   hasValues: false,
   numOpenedParentheses: 0,
 };
+
+handle(EventType.INITIALIZED, () => {
+  stateData.hasValues = false;
+  stateData.numOpenedParentheses = 0;
+  stateData.current = {
+    ...initialCurrent,
+  };
+});
 
 handle(EventType.VALUE_CHANGED, (event: ValueChangedEvent): void => {
   stateData.current.value = event.value;
@@ -124,12 +126,4 @@ export function shouldAddMultiplyForConstant(): boolean {
 
 export function isValueNumber(value: string): boolean {
   return isNumber(value);
-}
-
-export function dispose(): void {
-  stateData.hasValues = false;
-  stateData.numOpenedParentheses = 0;
-  stateData.current = {
-    ...initialCurrent,
-  };
 }

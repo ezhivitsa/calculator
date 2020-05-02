@@ -3,58 +3,98 @@
 import type { CalculationData } from 'pkg/calculator';
 import { MathOperation } from 'stores/types';
 
+type Action<T> = {
+  resolve: (data: T) => void;
+  reject: () => void;
+  callback: (instance: CalculationData) => T | Promise<T>;
+};
+
 export class CalculatorAdapter {
-  private _calculatorPromise: Promise<CalculationData>;
   private _calculatorInstance: CalculationData | null = null;
+  private _actions: Action<any>[] = [];
 
   constructor() {
-    this._calculatorPromise = this._init();
+    this._init();
   }
 
-  private async _init(): Promise<CalculationData> {
+  private async _init(): Promise<void> {
     const { CalculationData } = await import('../../../../pkg/calculator');
-
     this._calculatorInstance = CalculationData.new();
-    return this._calculatorInstance;
+
+    this._executeActions(this._calculatorInstance);
   }
 
-  private async _getInstance(): Promise<CalculationData> {
-    let instance: CalculationData;
-    if (this._calculatorInstance) {
-      instance = this._calculatorInstance;
-    } else {
-      instance = await this._calculatorPromise;
+  private _executeActions(instance: CalculationData): void {
+    while (this._actions.length) {
+      const [action] = this._actions;
+
+      const result = action.callback(instance);
+      if (result instanceof Promise) {
+        result.then(action.resolve).catch(action.reject);
+      } else {
+        action.resolve(result);
+      }
+
+      this._actions.splice(0, 1);
     }
-    return instance;
   }
 
-  async setValue(value: string): Promise<void> {
-    const instance = await this._getInstance();
-    instance.set_value(value);
+  private _addPromiseAction<T>(
+    resolve: () => void,
+    reject: () => void,
+    callback: (instance: CalculationData) => T | Promise<T>,
+  ): void {
+    this._actions.push({ resolve, reject, callback });
   }
 
-  async setOperation(operation: MathOperation): Promise<void> {
-    const instance = await this._getInstance();
-    instance.set_operation(operation);
+  private _waitInitInstance<T>(callback: (instance: CalculationData) => Promise<T> | T): Promise<T> | T {
+    if (this._calculatorInstance) {
+      return callback(this._calculatorInstance);
+    }
+
+    return new Promise((resolve, reject) => {
+      this._addPromiseAction(resolve, reject, callback);
+    });
   }
 
-  async addLeftParentheses(): Promise<void> {
-    const instance = await this._getInstance();
-    instance.add_left_parentheses();
+  setValue(value: string): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.set_value(value);
+    });
   }
 
-  async addRightParentheses(): Promise<void> {
-    const instance = await this._getInstance();
-    instance.add_right_parentheses();
+  setOperation(operation: MathOperation): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.set_operation(operation);
+    });
   }
 
-  async calculate(): Promise<string> {
-    const instance = await this._getInstance();
-    return instance.calculate();
+  addLeftParentheses(): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.add_left_parentheses();
+    });
+  }
+
+  addRightParentheses(): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.add_right_parentheses();
+    });
+  }
+
+  calculate(): string | Promise<string> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      try {
+        const result = instance.calculate();
+        return result;
+      } catch (err) {
+        return '';
+      }
+    });
   }
 
   async clean(): Promise<void> {
-    const instance = await this._getInstance();
-    return instance.clean();
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.clean();
+    });
   }
 }

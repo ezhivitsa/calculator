@@ -1,12 +1,14 @@
 import React, { Component, ReactNode } from 'react';
 
-import { PresentationStoreProvider, presentationStore } from './providers';
+import { PresentationStoreProvider } from './providers';
+import { PresentationStore } from 'stores';
+
 import { Calculator } from './components/pages/calculator';
 
 export class App extends Component {
   render(): ReactNode {
     return (
-      <PresentationStoreProvider value={presentationStore}>
+      <PresentationStoreProvider value={new PresentationStore()}>
         <Calculator />
       </PresentationStoreProvider>
     );

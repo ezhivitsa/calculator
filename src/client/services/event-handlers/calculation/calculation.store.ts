@@ -24,6 +24,6 @@ export function clean(): void {
   adapter.clean();
 }
 
-export function calculateResult(): Promise<string> {
+export function calculateResult(): string | Promise<string> {
   return adapter.calculate();
 }

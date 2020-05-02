@@ -5,6 +5,8 @@ import { Button } from 'components/global/button';
 import { NumberValue } from 'stores';
 import { calculateResult, setNumber } from 'services/app/calculation.app-service';
 
+import { usePresentationStore } from 'providers';
+
 import styles from './number-buttons.pcss';
 
 const buttons: NumberValue[] = [
@@ -22,8 +24,10 @@ const buttons: NumberValue[] = [
 ];
 
 export function NumberButtons(): ReactElement {
+  const presentationStore = usePresentationStore();
+
   function handleResultClick(): void {
-    calculateResult();
+    calculateResult(presentationStore.expression);
   }
 
   function handleNumberClick(number: NumberValue): void {

@@ -1,14 +1,13 @@
-import { send } from '../command-bus';
+import { send } from 'services/command-bus';
 
-import {
-  CommandType,
-  Command,
-  MathOperation,
-  Parentheses,
-  NumberValue,
-  MathConstant,
-  MathModifier,
-} from '../../stores/types';
+import { MathOperation, Parentheses, NumberValue, MathConstant, MathModifier, ExpressionValue } from 'stores/types';
+import { CommandType, Command } from 'services/types';
+
+export function init(): void {
+  send({
+    type: CommandType.INIT,
+  });
+}
 
 export function setNumber(value: NumberValue): void {
   send({
@@ -62,8 +61,9 @@ export function addParentheses(parentheses: Parentheses): void {
   send(command);
 }
 
-export function calculateResult(): void {
+export function calculateResult(expression: ExpressionValue[]): void {
   send({
     type: CommandType.CALCULATE_RESULT,
+    expression,
   });
 }

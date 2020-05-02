@@ -7,15 +7,13 @@ import { operationTexts } from 'texts';
 import {
   ValueChangedEvent,
   OperationAddedEvent,
-  MathModifier,
   ModifierAddedEvent,
   ResultCalculatedEvent,
   MathConstantAddedEvent,
-  MathConstant,
-  ExpressionValue,
   EventType,
-  MathOperation,
-} from './types';
+} from 'services/types';
+import { MathModifier, MathConstant, ExpressionValue, MathOperation } from './types';
+
 import { PREFIX_MODIFIERS } from './constants';
 
 type RepresentationValue = string | ExpressionValue;
@@ -74,6 +72,7 @@ export class PresentationStore {
   }
 
   private _initHandlers(): void {
+    handle(EventType.INITIALIZED, this._handleInitialized);
     handle(EventType.VALUE_CHANGED, this._handleValueChanged);
     handle(EventType.MATH_OPERATION_ADDED, this._handleOperationAdded);
     handle(EventType.LEFT_PARENTHESES_ADDED, this._handleLeftParenthesesAdded);
@@ -175,15 +174,9 @@ export class PresentationStore {
   };
 
   @action
-  handleResultCleared(): void {
-    this._result = '';
-  }
-
-  @action
-  dispose(): void {
+  private _handleInitialized = (): void => {
     this._expression = [];
     this._notClosedParentheses = 0;
-  }
+    this._result = '';
+  };
 }
-
-export const presentationStore = new PresentationStore();

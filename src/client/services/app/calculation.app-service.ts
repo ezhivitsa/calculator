@@ -3,7 +3,7 @@ import { send } from '../command-bus';
 import {
   CommandType,
   Command,
-  MathAction,
+  MathOperation,
   Parentheses,
   NumberValue,
   MathConstant,
@@ -17,7 +17,7 @@ export function setNumber(value: NumberValue): void {
   });
 }
 
-export function addAction(action: MathAction): void {
+export function addAction(action: MathOperation): void {
   send({
     type: CommandType.ADD_MATH_OPERATION,
     operation: action,

@@ -1,25 +1,35 @@
 import React, { ReactElement, ReactNode } from 'react';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import classnames from 'classnames';
 
 import { Button } from 'components/global/button';
 
-import { MathAction, CleanAction, calculationStore } from 'stores';
+import { MathOperation, CleanAction } from 'stores';
+import { addAction, cleanAll, clean } from 'services/app/calculation.app-service';
 import { usePresentationStore } from 'providers';
 
 import { LONG_PRESS_TIMEOUT } from 'constants/app';
+import { operationTexts } from 'texts';
 
 import styles from './math-buttons.pcss';
 
-const buttons: MathAction[] = [MathAction.DIVIDE, MathAction.MULTIPLY, MathAction.MINUS, MathAction.PLUS];
+const buttons: {
+  type: MathOperation;
+  text: string;
+}[] = [
+  { type: MathOperation.Divide, text: operationTexts.divide },
+  { type: MathOperation.Multiply, text: operationTexts.multiply },
+  { type: MathOperation.Minus, text: operationTexts.minus },
+  { type: MathOperation.Plus, text: operationTexts.plus },
+];
 
 export const MathButtons = observer(
   (): ReactElement => {
     const presentationStore = usePresentationStore();
     let timeout: number | null = null;
 
-    function handleButtonClick(action: MathAction): void {
-      calculationStore.addAction(action);
+    function handleButtonClick(action: MathOperation): void {
+      addAction(action);
     }
 
     function handleCleanMouseDown(): void {
@@ -29,7 +39,7 @@ export const MathButtons = observer(
 
       timeout = window.setTimeout(() => {
         timeout = null;
-        calculationStore.cleanAll();
+        cleanAll();
       }, LONG_PRESS_TIMEOUT);
     }
 
@@ -42,9 +52,9 @@ export const MathButtons = observer(
       timeout = null;
 
       if (!presentationStore.showResult) {
-        calculationStore.clean();
+        clean();
       } else {
-        calculationStore.cleanAll();
+        cleanAll();
       }
     }
 
@@ -63,10 +73,14 @@ export const MathButtons = observer(
 
     function renderButtons(): ReactNode[] {
       return buttons.map(
-        (button, index): ReactNode => {
+        (buttonData, index): ReactNode => {
           return (
-            <Button key={index} className={styles.mathButtons__btn} onClick={(): void => handleButtonClick(button)}>
-              {button}
+            <Button
+              key={index}
+              className={styles.mathButtons__btn}
+              onClick={(): void => handleButtonClick(buttonData.type)}
+            >
+              {buttonData.text}
             </Button>
           );
         },

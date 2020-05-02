@@ -1,1 +1,1 @@
-export { buttonTexts } from './buttons';
+export { buttonTexts, operationTexts } from './buttons';

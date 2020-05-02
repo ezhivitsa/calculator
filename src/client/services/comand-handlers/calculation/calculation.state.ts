@@ -1,14 +1,23 @@
 import { isNumber } from 'lib/numbers';
 
-import { ValueChangedEvent, NumberValue, MathAction, OperationAddedEvent, ModifierAddedEvent } from 'stores/types';
+import {
+  ValueChangedEvent,
+  NumberValue,
+  MathOperation,
+  OperationAddedEvent,
+  ModifierAddedEvent,
+  EventType,
+} from 'stores/types';
 import { PREFIX_MODIFIERS } from 'stores/constants';
+
+import { handle } from 'services/event-bus';
 
 const START_VALUE = '0';
 
 interface Current {
   value: string;
   hasMinusSign: boolean;
-  action: MathAction | null;
+  action: MathOperation | null;
   isValueConstant: boolean;
 }
 
@@ -33,32 +42,32 @@ const stateData: StateData = {
   numOpenedParentheses: 0,
 };
 
-export function handleValueChanged(event: ValueChangedEvent): void {
+handle(EventType.VALUE_CHANGED, (event: ValueChangedEvent): void => {
   stateData.current.value = event.value;
-}
+});
 
-export function handleOperationAdded(event: OperationAddedEvent): void {
+handle(EventType.MATH_OPERATION_ADDED, (event: OperationAddedEvent): void => {
   stateData.hasValues = true;
 
   stateData.current = {
     ...initialCurrent,
     action: event.operation,
   };
-}
+});
 
-export function handleLeftParenthesesAdded(): void {
+handle(EventType.LEFT_PARENTHESES_ADDED, (): void => {
   stateData.numOpenedParentheses += 1;
   stateData.hasValues = true;
   stateData.current = {
     ...initialCurrent,
   };
-}
+});
 
-export function handleRightParenthesesAdded(): void {
+handle(EventType.RIGHT_PARENTHESES_ADDED, (): void => {
   stateData.numOpenedParentheses -= 1;
-}
+});
 
-export function handleModifierAdded(event: ModifierAddedEvent): void {
+handle(EventType.MODIFIER_ADDED, (event: ModifierAddedEvent): void => {
   stateData.hasValues = true;
   stateData.current = {
     ...initialCurrent,
@@ -67,11 +76,11 @@ export function handleModifierAdded(event: ModifierAddedEvent): void {
   if (PREFIX_MODIFIERS.includes(event.modifier)) {
     stateData.numOpenedParentheses += 1;
   }
-}
+});
 
-export function handleMathConstantAdded(): void {
+handle(EventType.MATH_CONSTANT_ADDED, (): void => {
   stateData.current.isValueConstant = true;
-}
+});
 
 export function newValue(value: string): string | null {
   const newValue =
@@ -86,8 +95,8 @@ export function newValue(value: string): string | null {
   return newValue;
 }
 
-export function canAddSign(operation: MathAction): boolean {
-  if (operation !== MathAction.MINUS || stateData.current.hasMinusSign) {
+export function canAddSign(operation: MathOperation): boolean {
+  if (operation !== MathOperation.Minus || stateData.current.hasMinusSign) {
     return false;
   }
 

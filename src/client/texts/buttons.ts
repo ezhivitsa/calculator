@@ -16,3 +16,10 @@ export const buttonTexts = {
   square: '2',
   rnd: 'Rnd',
 };
+
+export const operationTexts = {
+  divide: '÷',
+  multiply: '×',
+  minus: '−',
+  plus: '+',
+};

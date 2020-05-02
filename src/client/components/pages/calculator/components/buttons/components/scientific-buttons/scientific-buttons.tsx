@@ -1,6 +1,7 @@
 import React, { useState, ReactElement, ReactNode } from 'react';
 
-import { MathModifier, MathConstant, calculationStore } from 'stores';
+import { MathModifier, MathConstant } from 'stores';
+import { addModifier, addConstant } from 'services/app/calculation.app-service';
 
 import { buttonTexts } from 'texts/buttons';
 
@@ -18,12 +19,12 @@ export function ScientificButtons(): ReactElement {
   const [showInverse, setShowInverse] = useState(false);
 
   function handleModifierClick(modifier: MathModifier): void {
-    calculationStore.addModifier(modifier);
+    addModifier(modifier);
     setShowInverse(false);
   }
 
   function handleConstantClick(constant: MathConstant): void {
-    calculationStore.addConstant(constant);
+    addConstant(constant);
   }
 
   function handleInverseClick(): void {

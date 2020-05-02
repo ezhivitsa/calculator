@@ -4,7 +4,7 @@ import {
   AddConstantCommand,
   EventType,
   MathConstant,
-  MathAction,
+  MathOperation,
   CommandType,
   CommandTypeMapping,
 } from 'stores/types';
@@ -25,8 +25,8 @@ import {
 
 import { restore } from 'services/event-bus';
 import { removeLastEvent, removeAllEvents } from 'services/event-store';
+import { clean, calculateResult } from 'services/event-handlers/calculation/calculation.store';
 
-import { actionsStore } from 'stores/actions';
 import { presentationStore } from 'stores/presentation';
 import { historyStory } from 'stores/history';
 
@@ -37,7 +37,7 @@ handle(CommandType.ADD_VALUE, (command: CommandTypeMapping[CommandType.ADD_VALUE
     }
     apply({
       type: EventType.MATH_OPERATION_ADDED,
-      operation: MathAction.MULTIPLY,
+      operation: MathOperation.Multiply,
     });
     apply({
       type: EventType.VALUE_CHANGED,
@@ -95,7 +95,7 @@ handle(CommandType.REMOVE_SYMBOL, (): void => {
   removeLastEvent();
 
   dispose();
-  actionsStore.dispose();
+  clean();
   presentationStore.dispose();
 
   restore();
@@ -105,7 +105,7 @@ handle(CommandType.REMOVE_ALL_SYMBOLS, (): void => {
   removeAllEvents();
 
   dispose();
-  actionsStore.dispose();
+  clean();
   presentationStore.dispose();
 
   restore();
@@ -122,7 +122,7 @@ handle(CommandType.ADD_MATH_CONSTANT, (command: AddConstantCommand): void => {
   if (shouldAddMultiplyForConstant()) {
     apply({
       type: EventType.MATH_OPERATION_ADDED,
-      operation: MathAction.MULTIPLY,
+      operation: MathOperation.Multiply,
     });
   }
 
@@ -159,7 +159,7 @@ handle(CommandType.ADD_MATH_CONSTANT, (command: AddConstantCommand): void => {
 handle(
   CommandType.CALCULATE_RESULT,
   async (): Promise<void> => {
-    const result = await actionsStore.calculateResult();
+    const result = await calculateResult();
     const { expression } = presentationStore;
 
     apply({

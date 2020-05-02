@@ -1,33 +1,6 @@
-import { Event, ResultCalculatedEvent, ExpressionValue } from './types';
+import { Event, ResultCalculatedEvent, ExpressionValue, EventType } from './types';
 
-// interface CalculationHistory {
-//   expression: ExpressionValue[];
-//   result: string | null;
-//   events: Event[];
-// }
-
-export class HistoryStore {
-  private _history: CalculationHistory[] = [];
-
-  get lastNumericResult(): string | null {
-    for (let i = this._history.length - 1; i >= 0; i -= 1) {
-      const historyItem = this._history[i];
-      if (historyItem.result) {
-        return historyItem.result;
-      }
-    }
-
-    return null;
-  }
-
-  handleResultCalculated({ expression, result, events }: ResultCalculatedEvent): void {
-    this._history.push({
-      expression,
-      result,
-      events,
-    });
-  }
-}
+import { handle } from 'services/event-bus';
 
 class CalculationHistory {
   private _expression: ExpressionValue[];
@@ -55,6 +28,33 @@ class CalculationHistory {
   setExpressionAsCurrent(): void {}
 
   setResultAsCurrent(): void {}
+}
+
+export class HistoryStore {
+  private _history: CalculationHistory[] = [];
+
+  constructor() {
+    this._initHandlers();
+  }
+
+  get lastNumericResult(): string | null {
+    for (let i = this._history.length - 1; i >= 0; i -= 1) {
+      const historyItem = this._history[i];
+      if (historyItem.result) {
+        return historyItem.result;
+      }
+    }
+
+    return null;
+  }
+
+  private _initHandlers(): void {
+    handle(EventType.RESULT_CALCULATED, this._handleResultCalculated);
+  }
+
+  private _handleResultCalculated = ({ expression, result, events }: ResultCalculatedEvent): void => {
+    this._history.push(new CalculationHistory(expression, result, events));
+  };
 }
 
 export const historyStory = new HistoryStore();

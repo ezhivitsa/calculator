@@ -1,5 +1,9 @@
 import { action, observable, computed } from 'mobx';
 
+import { handle } from 'services/event-bus';
+
+import { operationTexts } from 'texts';
+
 import {
   ValueChangedEvent,
   OperationAddedEvent,
@@ -9,20 +13,25 @@ import {
   MathConstantAddedEvent,
   MathConstant,
   ExpressionValue,
+  EventType,
+  MathOperation,
 } from './types';
 import { PREFIX_MODIFIERS } from './constants';
 
 type RepresentationValue = string | ExpressionValue;
 
-type ModifierRepresentation = {
+const operationPresentation: {
+  readonly [key in MathOperation]: string;
+} = {
+  [MathOperation.Divide]: operationTexts.divide,
+  [MathOperation.Multiply]: operationTexts.multiply,
+  [MathOperation.Minus]: operationTexts.minus,
+  [MathOperation.Plus]: operationTexts.plus,
+};
+
+const modifierRepresentation: {
   readonly [key in MathModifier]: RepresentationValue;
-};
-
-type ConstantRepresentation = {
-  readonly [key in MathConstant]: RepresentationValue;
-};
-
-const modifierRepresentation: ModifierRepresentation = {
+} = {
   [MathModifier.PERCENT]: '%',
   [MathModifier.FACTORIAL]: '!',
   [MathModifier.SIN]: 'sin(',
@@ -37,7 +46,9 @@ const modifierRepresentation: ModifierRepresentation = {
   [MathModifier.EXP]: 'E',
 };
 
-const constantRepresentation: ConstantRepresentation = {
+const constantRepresentation: {
+  readonly [key in MathConstant]: RepresentationValue;
+} = {
   [MathConstant.PI]: {
     value: 'π',
     bold: true,
@@ -57,6 +68,20 @@ export class PresentationStore {
   @observable private _expression: ExpressionValue[] = [];
   @observable private _notClosedParentheses = 0;
   @observable private _result = '';
+
+  constructor() {
+    this._initHandlers();
+  }
+
+  private _initHandlers(): void {
+    handle(EventType.VALUE_CHANGED, this._handleValueChanged);
+    handle(EventType.MATH_OPERATION_ADDED, this._handleOperationAdded);
+    handle(EventType.LEFT_PARENTHESES_ADDED, this._handleLeftParenthesesAdded);
+    handle(EventType.RIGHT_PARENTHESES_ADDED, this._handleRightParenthesesAdded);
+    handle(EventType.MODIFIER_ADDED, this._handleModifierAdded);
+    handle(EventType.MATH_CONSTANT_ADDED, this._handleMathConstantAdded);
+    handle(EventType.RESULT_CALCULATED, this._handleResultCalculated);
+  }
 
   @computed
   get showResult(): boolean {
@@ -101,53 +126,53 @@ export class PresentationStore {
   }
 
   @action
-  handleValueChanged({ addedValue, value }: ValueChangedEvent): void {
+  private _handleValueChanged = ({ addedValue, value }: ValueChangedEvent): void => {
     if (!this._expression) {
       this._addToExpression(value);
     } else {
       this._addToExpression(addedValue);
     }
-  }
+  };
 
   @action
-  handleOperationAdded({ operation }: OperationAddedEvent): void {
-    this._addToExpression(` ${operation} `);
-  }
+  private _handleOperationAdded = ({ operation }: OperationAddedEvent): void => {
+    this._addToExpression(` ${operationPresentation[operation]} `);
+  };
 
   @action
-  handleLeftParenthesesAdded(): void {
+  private _handleLeftParenthesesAdded = (): void => {
     this._addToExpression('(');
     this._notClosedParentheses += 1;
-  }
+  };
 
   @action
-  handleRightParenthesesAdded(): void {
+  private _handleRightParenthesesAdded = (): void => {
     this._addToExpression(')');
     this._notClosedParentheses -= 1;
-  }
+  };
 
   @action
-  handleModifierAdded({ modifier }: ModifierAddedEvent): void {
+  private _handleModifierAdded = ({ modifier }: ModifierAddedEvent): void => {
     const isPrefix = PREFIX_MODIFIERS.includes(modifier);
     this._addToExpression(`${isPrefix ? ' ' : ''}${modifierRepresentation[modifier]}`);
     if (isPrefix) {
       this._notClosedParentheses += 1;
     }
-  }
+  };
 
   @action
-  handleMathConstantAdded({ value, constant }: MathConstantAddedEvent): void {
+  private _handleMathConstantAdded = ({ value, constant }: MathConstantAddedEvent): void => {
     if (constant === MathConstant.RANDOM && value) {
       this._addToExpression(value);
     } else {
       this._addToExpression(constantRepresentation[constant]);
     }
-  }
+  };
 
   @action
-  handleResultCalculated({ result }: ResultCalculatedEvent): void {
+  private _handleResultCalculated = ({ result }: ResultCalculatedEvent): void => {
     this._result = result || ERROR;
-  }
+  };
 
   @action
   handleResultCleared(): void {

@@ -1,8 +1,8 @@
-export enum MathAction {
-  DIVIDE = '÷',
-  MULTIPLY = '×',
-  MINUS = '−',
-  PLUS = '+',
+export enum MathOperation {
+  Divide,
+  Multiply,
+  Minus,
+  Plus,
 }
 
 export enum MathModifier {
@@ -79,7 +79,7 @@ export interface AddValueCommand extends BaseCommand {
 }
 
 export interface AddMathOperationCommand extends BaseCommand {
-  operation: MathAction;
+  operation: MathOperation;
 }
 
 export interface AddModifierCommand extends BaseCommand {
@@ -126,7 +126,7 @@ export interface ValueChangedEvent extends BaseEvent {
 }
 
 export interface OperationAddedEvent extends BaseEvent {
-  operation: MathAction;
+  operation: MathOperation;
 }
 
 export interface ModifierAddedEvent extends BaseEvent {

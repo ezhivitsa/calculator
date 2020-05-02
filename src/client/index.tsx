@@ -3,10 +3,13 @@ import 'regenerator-runtime/runtime';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
+import 'mobx-react-lite/batchingForReactDom'
+
 import { App } from './app';
 
-import './styles/global.pcss';
+import 'services';
 
-import('../../pkg/calculator.js');
+import './styles/global.pcss';
 
 ReactDOM.render(<App />, document.getElementById('root'));

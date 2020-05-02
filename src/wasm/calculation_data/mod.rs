@@ -7,6 +7,8 @@ use std::cell::RefCell;
 
 use phf::phf_map;
 
+use wasm_bindgen::prelude::*;
+
 static MATH_CONSTANTS_MAP: phf::Map<&'static str, f64> = phf_map! {
   "pi" => PI,
   "e" => E,
@@ -32,7 +34,8 @@ fn parse_float(value: &str) -> f64 {
   }
 }
 
-enum MathOperation {
+#[wasm_bindgen]
+pub enum MathOperation {
   Divide,
   Multiply,
   Minus,
@@ -82,10 +85,6 @@ impl Node {
 
   fn set_value(&mut self, value: Value) {
     self.value = value;
-  }
-
-  fn set_operation(&mut self, operation: MathOperation) {
-    self.value = Value::Operation(operation);
   }
 
   fn get_value(&self) -> f64 {
@@ -147,13 +146,15 @@ impl Node {
   }
 }
 
-struct CalculationData {
+#[wasm_bindgen]
+pub struct CalculationData {
   expression: Rc<RefCell<Node>>,
   expressions_stack: Vec<Rc<RefCell<Node>>>
 }
 
+#[wasm_bindgen]
 impl CalculationData {
-  fn new() -> CalculationData {
+  pub fn new() -> CalculationData {
     let expression = Node::new();
     let expression_ref = Rc::new(RefCell::new(expression));
 
@@ -165,7 +166,7 @@ impl CalculationData {
     }
   }
 
-  fn set_value(&mut self, value: &str) {
+  pub fn set_value(&mut self, value: &str) {
     let value_num = parse_float(value);
 
     let mut expression = self.expression.borrow_mut();
@@ -183,19 +184,12 @@ impl CalculationData {
     }
   }
 
-  fn set_priority_operation(&mut self, operation: MathOperation) {
-    let current_expression = self.expression.clone();
-    let mut expression = current_expression.borrow_mut();
-    
-    expression.set_operation(operation);
-
-    let right = Rc::new(RefCell::new(Node::new()));
-    expression.right = Some(right.clone());
-
-    self.expression = right.clone();
+  fn set_non_priority_operation(&mut self, operation: MathOperation) {
+    let right = self.set_priority_operation(operation);
+    self.expressions_stack.push(right);
   }
 
-  fn set_non_priority_operation(&mut self, operation: MathOperation) {
+  fn set_priority_operation(&mut self, operation: MathOperation) -> Rc<RefCell<Node>> {
     let root_expression = self.expressions_stack.last().unwrap();
     let mut expression = root_expression.borrow_mut();
 
@@ -212,9 +206,10 @@ impl CalculationData {
     expression.right = Some(right.clone());
 
     self.expression = right.clone();
+    right.clone()
   }
 
-  fn set_operation(&mut self, operation: MathOperation) {
+  pub fn set_operation(&mut self, operation: MathOperation) {
     match operation {
       MathOperation::Divide | MathOperation::Multiply => {
         self.set_priority_operation(operation);
@@ -239,7 +234,7 @@ impl CalculationData {
     false
   }
 
-  fn add_left_parentheses(&mut self) {
+  pub fn add_left_parentheses(&mut self) {
     let should_add_multiply = self.should_add_multiply_before_parentheses();
     if should_add_multiply {
         println!("add operation");
@@ -247,25 +242,28 @@ impl CalculationData {
     }
 
     let current_expression = self.expression.clone();
-    let mut expression = current_expression.borrow_mut();
-
     self.expressions_stack.push(current_expression.clone());
-
-    let left = Rc::new(RefCell::new(Node::new()));
-    expression.left = Some(left.clone());
-
-    self.expressions_stack.push(left.clone());
-    self.expression = left.clone();
   }
 
-  fn add_right_parentheses(&mut self) {
+  pub fn add_right_parentheses(&mut self) {
     self.expressions_stack.pop();
     let root_expression = self.expressions_stack.pop().unwrap();
     self.expression = root_expression.clone();
   }
 
-  fn calculate(self) -> f64 {
+  pub fn calculate(&self) -> String {
     let expression = self.expressions_stack.first().unwrap().borrow();
-    expression.get_value()
+    let result = expression.get_value();
+    result.to_string()
+  }
+
+  pub fn clean(&mut self) {
+    let expression = Node::new();
+    let expression_ref = Rc::new(RefCell::new(expression));
+
+    let expressions_stack = vec![expression_ref.clone()];
+
+    self.expression = expression_ref;
+    self.expressions_stack = expressions_stack;
   }
 }

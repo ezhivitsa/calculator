@@ -1,4 +1,4 @@
-import { CommandType, Command, CommandTypeMapping } from '../stores/types';
+import { CommandType, Command, CommandTypeMapping } from 'stores/types';
 
 type Handlers = {
   [key in CommandType]: ((command: CommandTypeMapping[key]) => void)[];

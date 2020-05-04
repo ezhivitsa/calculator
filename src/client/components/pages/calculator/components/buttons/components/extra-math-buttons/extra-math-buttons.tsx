@@ -2,8 +2,10 @@ import React, { ReactElement, ReactNode } from 'react';
 
 import { Button } from 'components/global/button';
 
-import { Parentheses, MathModifier } from 'stores';
+import { Parentheses, PostfixModifier } from 'stores';
 import { addParentheses, addModifier } from 'services/app/calculation.app-service';
+
+import { buttonTexts } from 'texts';
 
 import styles from './extra-math-buttons.pcss';
 
@@ -12,8 +14,8 @@ export function ExtraMathButtons(): ReactElement {
     addParentheses(parentheses);
   }
 
-  function handleModifierClick(modifier: MathModifier): void {
-    addModifier(modifier);
+  function handleModifierClick(modifier: PostfixModifier): void {
+    // addModifier(modifier);
   }
 
   const buttons = [
@@ -26,8 +28,8 @@ export function ExtraMathButtons(): ReactElement {
       onClick: () => handleParenthesesClick(Parentheses.RIGHT),
     },
     {
-      title: MathModifier.PERCENT,
-      onClick: () => handleModifierClick(MathModifier.PERCENT),
+      title: buttonTexts.percent,
+      onClick: () => handleModifierClick(PostfixModifier.Percent),
     },
   ];
 

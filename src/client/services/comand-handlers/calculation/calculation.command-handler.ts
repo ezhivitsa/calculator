@@ -24,7 +24,6 @@ import {
 
 import { restore } from 'services/event-bus';
 import { removeLastEvent, removeAllEvents } from 'services/event-store';
-import { calculateResult } from 'services/event-handlers/calculation/calculation.store';
 
 import { historyStory } from 'stores/history';
 
@@ -150,16 +149,11 @@ handle(CommandType.ADD_MATH_CONSTANT, (command: AddConstantCommand): void => {
   });
 });
 
-handle(
-  CommandType.CALCULATE_RESULT,
-  async (command: CalculateResultCommand): Promise<void> => {
-    const result = await calculateResult();
-
-    apply({
-      type: EventType.RESULT_CALCULATED,
-      result,
-      expression: command.expression,
-      events: getEvents(),
-    });
-  },
-);
+handle(CommandType.CALCULATE_RESULT, (command: CalculateResultCommand): void => {
+  apply({
+    type: EventType.RESULT_CALCULATED,
+    result: command.result,
+    expression: command.expression,
+    events: getEvents(),
+  });
+});

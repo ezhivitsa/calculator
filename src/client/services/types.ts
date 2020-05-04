@@ -1,4 +1,4 @@
-import { MathOperation, MathModifier, ExpressionValue, MathConstant } from 'stores/types';
+import { MathOperation, PrefixModifier, ExpressionValue, MathConstant } from 'stores/types';
 
 // Commands
 
@@ -28,7 +28,7 @@ export interface AddMathOperationCommand extends BaseCommand {
 }
 
 export interface AddModifierCommand extends BaseCommand {
-  modifier: MathModifier;
+  modifier: PrefixModifier;
 }
 
 export interface AddConstantCommand extends BaseCommand {
@@ -37,6 +37,7 @@ export interface AddConstantCommand extends BaseCommand {
 
 export interface CalculateResultCommand extends BaseCommand {
   expression: ExpressionValue[];
+  result: string;
 }
 
 export type Command =
@@ -87,7 +88,7 @@ export interface OperationAddedEvent extends BaseEvent {
 }
 
 export interface ModifierAddedEvent extends BaseEvent {
-  modifier: MathModifier;
+  modifier: PrefixModifier;
 }
 
 export interface ResultCalculatedEvent extends BaseEvent {

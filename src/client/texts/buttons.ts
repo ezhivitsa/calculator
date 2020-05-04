@@ -15,6 +15,7 @@ export const buttonTexts = {
   minusOne: '-1',
   square: '2',
   rnd: 'Rnd',
+  percent: '%',
 };
 
 export const operationTexts = {

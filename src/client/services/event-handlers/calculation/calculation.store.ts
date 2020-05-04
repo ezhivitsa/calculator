@@ -1,4 +1,4 @@
-import { MathOperation } from 'stores/types';
+import { MathOperation, PrefixModifier } from 'stores/types';
 
 import { CalculatorAdapter } from 'adapters/calculator';
 
@@ -24,6 +24,18 @@ export function clean(): void {
   adapter.clean();
 }
 
-export function calculateResult(): string | Promise<string> {
+export function calculateResult(): Promise<string> {
   return adapter.calculate();
+}
+
+export function validate(): Promise<boolean> {
+  return adapter.validate();
+}
+
+export function addConstant(value: string): void {
+  adapter.addConstant(value);
+}
+
+export function addModifier(modifier: PrefixModifier): void {
+  adapter.addPrefixModifier(modifier);
 }

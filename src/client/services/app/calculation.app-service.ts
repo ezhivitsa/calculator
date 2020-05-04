@@ -1,7 +1,9 @@
 import { send } from 'services/command-bus';
 
-import { MathOperation, Parentheses, NumberValue, MathConstant, MathModifier, ExpressionValue } from 'stores/types';
+import { MathOperation, Parentheses, NumberValue, MathConstant, PrefixModifier, ExpressionValue } from 'stores/types';
 import { CommandType, Command } from 'services/types';
+
+import { validate, calculateResult as calculate } from 'services/event-handlers/calculation/calculation.store';
 
 export function init(): void {
   send({
@@ -23,7 +25,7 @@ export function addAction(action: MathOperation): void {
   });
 }
 
-export function addModifier(modifier: MathModifier): void {
+export function addModifier(modifier: PrefixModifier): void {
   send({
     type: CommandType.ADD_MODIFIER,
     modifier,
@@ -61,9 +63,17 @@ export function addParentheses(parentheses: Parentheses): void {
   send(command);
 }
 
-export function calculateResult(expression: ExpressionValue[]): void {
+export async function calculateResult(expression: ExpressionValue[]): Promise<void> {
+  const valid = await validate();
+  if (!valid) {
+    return;
+  }
+
+  const result = await calculate();
+
   send({
     type: CommandType.CALCULATE_RESULT,
     expression,
+    result,
   });
 }

@@ -12,9 +12,7 @@ import {
   MathConstantAddedEvent,
   EventType,
 } from 'services/types';
-import { MathModifier, MathConstant, ExpressionValue, MathOperation } from './types';
-
-import { PREFIX_MODIFIERS } from './constants';
+import { PrefixModifier, MathConstant, ExpressionValue, MathOperation } from './types';
 
 type RepresentationValue = string | ExpressionValue;
 
@@ -27,21 +25,18 @@ const operationPresentation: {
   [MathOperation.Plus]: operationTexts.plus,
 };
 
-const modifierRepresentation: {
-  readonly [key in MathModifier]: RepresentationValue;
+const prefixModifierRepresentation: {
+  readonly [key in PrefixModifier]: RepresentationValue;
 } = {
-  [MathModifier.PERCENT]: '%',
-  [MathModifier.FACTORIAL]: '!',
-  [MathModifier.SIN]: 'sin(',
-  [MathModifier.ASIN]: 'arcsin(',
-  [MathModifier.LN]: 'ln(',
-  [MathModifier.COS]: 'cos(',
-  [MathModifier.ACOS]: 'arccos(',
-  [MathModifier.LOG]: 'log(',
-  [MathModifier.TAN]: 'tan(',
-  [MathModifier.ATAN]: 'arctan(',
-  [MathModifier.SQUARE_ROOT]: '√(',
-  [MathModifier.EXP]: 'E',
+  [PrefixModifier.Sin]: 'sin(',
+  [PrefixModifier.Asin]: 'arcsin(',
+  [PrefixModifier.Ln]: 'ln(',
+  [PrefixModifier.Cos]: 'cos(',
+  [PrefixModifier.Acos]: 'arccos(',
+  [PrefixModifier.Log]: 'log(',
+  [PrefixModifier.Tan]: 'tan(',
+  [PrefixModifier.Atan]: 'arctan(',
+  [PrefixModifier.SquareRoot]: '√(',
 };
 
 const constantRepresentation: {
@@ -152,11 +147,8 @@ export class PresentationStore {
 
   @action
   private _handleModifierAdded = ({ modifier }: ModifierAddedEvent): void => {
-    const isPrefix = PREFIX_MODIFIERS.includes(modifier);
-    this._addToExpression(`${isPrefix ? ' ' : ''}${modifierRepresentation[modifier]}`);
-    if (isPrefix) {
-      this._notClosedParentheses += 1;
-    }
+    this._addToExpression(` ${prefixModifierRepresentation[modifier]}`);
+    this._notClosedParentheses += 1;
   };
 
   @action

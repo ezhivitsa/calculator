@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
 import type { CalculationData } from 'pkg/calculator';
-import { MathOperation } from 'stores/types';
+import { MathOperation, PrefixModifier } from 'stores/types';
 
 type Action<T> = {
   resolve: (data: T) => void;
@@ -81,7 +81,7 @@ export class CalculatorAdapter {
     });
   }
 
-  calculate(): string | Promise<string> {
+  async calculate(): Promise<string> {
     return this._waitInitInstance((instance: CalculationData) => {
       try {
         const result = instance.calculate();
@@ -89,6 +89,24 @@ export class CalculatorAdapter {
       } catch (err) {
         return '';
       }
+    });
+  }
+
+  async validate(): Promise<boolean> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.validate();
+    });
+  }
+
+  addConstant(value: string): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.add_constant(value);
+    });
+  }
+
+  addPrefixModifier(modifier: PrefixModifier): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.add_prefix_modifier(modifier);
     });
   }
 

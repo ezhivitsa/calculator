@@ -20,6 +20,24 @@ export enum MathModifier {
   EXP = 'exp',
 }
 
+export enum PostfixModifier {
+  Percent,
+  Factorial,
+  Exp,
+}
+
+export enum PrefixModifier {
+  Sin,
+  Asin,
+  Ln,
+  Cos,
+  Acos,
+  Log,
+  Tan,
+  Atan,
+  SquareRoot,
+}
+
 export enum NumberValue {
   ZERO = '0',
   ONE = '1',

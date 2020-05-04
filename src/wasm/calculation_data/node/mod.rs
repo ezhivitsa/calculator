@@ -5,7 +5,7 @@ pub mod math_operation;
 pub use math_operation::{MathOperation};
 
 pub mod modifier;
-pub use modifier::{Modifier};
+pub use modifier::{Modifier, Measurement};
 
 pub enum Value {
   None,
@@ -41,7 +41,7 @@ impl Node {
     self.right = Some(node);
   }
 
-  pub fn get_value(&self) -> f64 {
+  pub fn get_value(&self, measurement: &Measurement) -> f64 {
     match &self.value {
       Value::Float(value) => {
         *value
@@ -50,7 +50,7 @@ impl Node {
       Value::Operation(operation) => {
         let left_value = match &self.left {
           Some(node) => {
-            node.borrow().get_value()
+            node.borrow().get_value(measurement)
           },
           None => {
             panic!("Error when get left_value");
@@ -59,7 +59,7 @@ impl Node {
 
         let right_value = match &self.right {
           Some(node) => {
-            node.borrow().get_value()
+            node.borrow().get_value(measurement)
           },
           None => {
             panic!("Error when get right_value");
@@ -72,20 +72,20 @@ impl Node {
       Value::Modifier(modifier) => {
         let left_value = match &self.left {
           Some(node) => {
-            node.borrow().get_value()
+            node.borrow().get_value(measurement)
           },
           None => {
             panic!("Error when get expression for modifier");
           }
         };
 
-        modifier::apply_modifier(&left_value, modifier)
+        modifier::apply_modifier(&left_value, modifier, measurement)
       },
 
       Value::None => {
         match &self.left {
           Some(node) => {
-            node.borrow().get_value()
+            node.borrow().get_value(measurement)
           },
           None => {
             panic!("Error when get left value for node with Node value");

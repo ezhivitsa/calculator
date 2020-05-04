@@ -1,4 +1,4 @@
-import { MathOperation, PrefixModifier, ExpressionValue, MathConstant } from 'stores/types';
+import { MathOperation, PrefixModifier, ExpressionValue, MathConstant, MeasurementType } from 'stores/types';
 
 // Commands
 
@@ -13,6 +13,7 @@ export enum CommandType {
   REMOVE_ALL_SYMBOLS = 'remove-all-symbols',
   CALCULATE_RESULT = 'calculate-result',
   ADD_MATH_CONSTANT = 'add-math-constant',
+  SET_MEASUREMENT = 'set-measurement',
 }
 
 export interface BaseCommand {
@@ -40,13 +41,18 @@ export interface CalculateResultCommand extends BaseCommand {
   result: string;
 }
 
+export interface SetMeasurementCommand extends BaseCommand {
+  measurement: MeasurementType;
+}
+
 export type Command =
   | BaseCommand
   | AddValueCommand
   | AddMathOperationCommand
   | AddModifierCommand
   | AddConstantCommand
-  | CalculateResultCommand;
+  | CalculateResultCommand
+  | SetMeasurementCommand;
 
 export type CommandTypeMapping = {
   [CommandType.INIT]: BaseCommand;
@@ -59,6 +65,7 @@ export type CommandTypeMapping = {
   [CommandType.REMOVE_ALL_SYMBOLS]: BaseCommand;
   [CommandType.CALCULATE_RESULT]: CalculateResultCommand;
   [CommandType.ADD_MATH_CONSTANT]: AddConstantCommand;
+  [CommandType.SET_MEASUREMENT]: SetMeasurementCommand;
 };
 
 // Events
@@ -72,6 +79,7 @@ export enum EventType {
   MODIFIER_ADDED = 'modifier-added',
   RESULT_CALCULATED = 'result-calculated',
   MATH_CONSTANT_ADDED = 'math-constant-added',
+  MEASUREMENT_CHANGED = 'measurement-changed',
 }
 
 export interface BaseEvent {
@@ -102,13 +110,18 @@ export interface MathConstantAddedEvent extends BaseEvent {
   value?: string;
 }
 
+export interface MeasurementChangedEvent extends BaseEvent {
+  measurement: MeasurementType;
+}
+
 export type Event =
   | BaseEvent
   | ValueChangedEvent
   | OperationAddedEvent
   | ModifierAddedEvent
   | ResultCalculatedEvent
-  | MathConstantAddedEvent;
+  | MathConstantAddedEvent
+  | MeasurementChangedEvent;
 
 export type EventTypeMapping = {
   [EventType.INITIALIZED]: BaseEvent;
@@ -119,4 +132,5 @@ export type EventTypeMapping = {
   [EventType.MODIFIER_ADDED]: ModifierAddedEvent;
   [EventType.RESULT_CALCULATED]: ResultCalculatedEvent;
   [EventType.MATH_CONSTANT_ADDED]: MathConstantAddedEvent;
+  [EventType.MEASUREMENT_CHANGED]: MeasurementChangedEvent;
 };

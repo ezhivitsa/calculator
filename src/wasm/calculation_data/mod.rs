@@ -8,7 +8,7 @@ use std::cell::RefCell;
 use phf::phf_map;
 
 pub mod node;
-pub use node::{MathOperation, Modifier};
+pub use node::{MathOperation, Modifier, Measurement};
 use node::{Node, Value};
 
 use wasm_bindgen::prelude::*;
@@ -41,7 +41,8 @@ fn parse_float(value: &str) -> f64 {
 #[wasm_bindgen]
 pub struct CalculationData {
   expression: Rc<RefCell<Node>>,
-  expressions_stack: Vec<Rc<RefCell<Node>>>
+  expressions_stack: Vec<Rc<RefCell<Node>>>,
+  measurement: Measurement,
 }
 
 #[wasm_bindgen]
@@ -54,7 +55,8 @@ impl CalculationData {
 
     CalculationData {
       expression: expression_ref,
-      expressions_stack
+      expressions_stack,
+      measurement: Measurement::Rad
     }
   }
 
@@ -137,7 +139,7 @@ impl CalculationData {
 
   pub fn calculate(&self) -> String {
     let expression = self.expressions_stack.first().unwrap().borrow();
-    let result = expression.get_value();
+    let result = expression.get_value(&self.measurement);
     result.to_string()
   }
 
@@ -171,5 +173,9 @@ impl CalculationData {
       left.clone()
     };
     self.expression = left;
+  }
+
+  pub fn set_measurement(&mut self, measurement: Measurement) {
+    self.measurement = measurement;
   }
 }

@@ -1,7 +1,7 @@
 import React, { Component, ReactNode } from 'react';
 
-import { PresentationStoreProvider } from './providers';
-import { PresentationStore } from 'stores';
+import { PresentationStoreProvider, CalculatorStoreProvider } from './providers';
+import { PresentationStore, CalculatorStore } from 'stores';
 
 import { Calculator } from './components/pages/calculator';
 
@@ -9,7 +9,9 @@ export class App extends Component {
   render(): ReactNode {
     return (
       <PresentationStoreProvider value={new PresentationStore()}>
-        <Calculator />
+        <CalculatorStoreProvider value={new CalculatorStore()}>
+          <Calculator />
+        </CalculatorStoreProvider>
       </PresentationStoreProvider>
     );
   }

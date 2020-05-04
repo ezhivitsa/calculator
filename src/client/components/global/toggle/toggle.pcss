@@ -1,0 +1,37 @@
+@import 'variables.pcss';
+
+.toggle {
+  display: flex;
+  border-radius: var(--border-radius-200);
+  cursor: pointer;
+  box-sizing: border-box;
+  line-height: calc(var(--grid9) - 2px);
+  font-size: var(--font-size-300);
+  background: var(--color-grey-300);
+  border: 1px solid var(--color-grey-300);
+  align-items: center;
+
+  &__item {
+    flex: 1;
+    text-align: center;
+    min-width: 60px;
+    color: var(--color-grey-400);
+    position: relative;
+
+    &:not(:last-of-type) {
+      &::before {
+        content: '';
+        position: absolute;
+        width: 1px;
+        top: var(--grid2);
+        bottom: var(--grid2);
+        background: var(--color-grey-600);
+        right: 0;
+      }
+    }
+
+    &._active {
+      color: var(--color-grey-700);
+    }
+  }
+}

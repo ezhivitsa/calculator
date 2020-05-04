@@ -38,6 +38,11 @@ export enum PrefixModifier {
   SquareRoot,
 }
 
+export enum MeasurementType {
+  Rad,
+  Deg,
+}
+
 export enum NumberValue {
   ZERO = '0',
   ONE = '1',
@@ -69,7 +74,7 @@ export enum MathConstant {
   RANDOM = 'Rnd',
 }
 
-export type ExpressionValue = {
+export interface ExpressionValue {
   value: string;
   bold: boolean;
-};
+}

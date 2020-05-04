@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
 import type { CalculationData } from 'pkg/calculator';
-import { MathOperation, PrefixModifier } from 'stores/types';
+import { MathOperation, PrefixModifier, MeasurementType } from 'stores/types';
 
 type Action<T> = {
   resolve: (data: T) => void;
@@ -113,6 +113,12 @@ export class CalculatorAdapter {
   async clean(): Promise<void> {
     return this._waitInitInstance((instance: CalculationData) => {
       return instance.clean();
+    });
+  }
+
+  setMeasurement(measurement: MeasurementType): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.set_measurement(measurement);
     });
   }
 }

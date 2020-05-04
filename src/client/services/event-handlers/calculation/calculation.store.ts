@@ -1,4 +1,4 @@
-import { MathOperation, PrefixModifier } from 'stores/types';
+import { MathOperation, PrefixModifier, MeasurementType } from 'stores/types';
 
 import { CalculatorAdapter } from 'adapters/calculator';
 
@@ -38,4 +38,8 @@ export function addConstant(value: string): void {
 
 export function addModifier(modifier: PrefixModifier): void {
   adapter.addPrefixModifier(modifier);
+}
+
+export function setMeasurement(measurement: MeasurementType): void {
+  adapter.setMeasurement(measurement);
 }

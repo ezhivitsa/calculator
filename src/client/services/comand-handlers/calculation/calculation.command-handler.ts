@@ -7,6 +7,7 @@ import {
   CommandType,
   CommandTypeMapping,
   CalculateResultCommand,
+  SetMeasurementCommand,
 } from 'services/types';
 
 import { handle } from 'services/command-bus';
@@ -155,5 +156,12 @@ handle(CommandType.CALCULATE_RESULT, (command: CalculateResultCommand): void => 
     result: command.result,
     expression: command.expression,
     events: getEvents(),
+  });
+});
+
+handle(CommandType.SET_MEASUREMENT, (command: SetMeasurementCommand): void => {
+  apply({
+    type: EventType.MEASUREMENT_CHANGED,
+    measurement: command.measurement,
   });
 });

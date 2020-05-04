@@ -7,6 +7,7 @@ import {
   ModifierAddedEvent,
   ResultCalculatedEvent,
   ValueChangedEvent,
+  MeasurementChangedEvent,
 } from 'services/types';
 
 import {
@@ -17,6 +18,7 @@ import {
   clean,
   addConstant,
   addModifier,
+  setMeasurement,
 } from './calculation.store';
 
 handle(EventType.INITIALIZED, (): void => {
@@ -43,8 +45,12 @@ handle(EventType.MODIFIER_ADDED, (event: ModifierAddedEvent): void => {
   addModifier(event.modifier);
 });
 
-handle(EventType.RESULT_CALCULATED, (event: ResultCalculatedEvent): void => {});
+// handle(EventType.RESULT_CALCULATED, (event: ResultCalculatedEvent): void => {});
 
 handle(EventType.VALUE_CHANGED, ({ value }: ValueChangedEvent): void => {
   setValue(value);
+});
+
+handle(EventType.MEASUREMENT_CHANGED, ({ measurement }: MeasurementChangedEvent): void => {
+  setMeasurement(measurement);
 });

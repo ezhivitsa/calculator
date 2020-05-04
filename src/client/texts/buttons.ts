@@ -18,6 +18,11 @@ export const buttonTexts = {
   percent: '%',
 };
 
+export const measurementTypeTexts = {
+  rad: 'Rad',
+  deg: 'Deg',
+};
+
 export const operationTexts = {
   divide: '÷',
   multiply: '×',

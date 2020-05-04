@@ -1,3 +1,5 @@
+use std::f64::consts::PI;
+
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -11,6 +13,12 @@ pub enum Modifier {
   Tan,
   Atan,
   SquareRoot,
+}
+
+#[wasm_bindgen]
+pub enum Measurement {
+  Rad,
+  Deg
 }
 
 pub fn copy_modifier(modifier: &Modifier) -> Modifier {
@@ -27,16 +35,33 @@ pub fn copy_modifier(modifier: &Modifier) -> Modifier {
   }
 }
 
-pub fn apply_modifier(value: &f64, modifier: &Modifier) -> f64 {
+fn get_value_for_measurement(value: &f64, measurement: &Measurement) ->f64 {
+  match measurement {
+    Measurement::Rad => {
+      *value
+    },
+    Measurement::Deg => {
+      *value * PI / 180.0
+    }
+  }
+}
+
+pub fn apply_modifier(
+  value: &f64,
+  modifier: &Modifier,
+  measurement: &Measurement
+) -> f64 {
+  let value_for_measurement = get_value_for_measurement(value, measurement);
+
   match modifier {
-    Modifier::Sin => value.sin(),
-    Modifier::Asin => value.asin(),
+    Modifier::Sin => value_for_measurement.sin(),
+    Modifier::Asin => value_for_measurement.asin(),
     Modifier::Ln => value.ln(),
-    Modifier::Cos => value.cos(),
-    Modifier::Acos => value.acos(),
+    Modifier::Cos => value_for_measurement.cos(),
+    Modifier::Acos => value_for_measurement.acos(),
     Modifier::Log => value.log10(),
-    Modifier::Tan => value.tan(),
-    Modifier::Atan => value.atan(),
+    Modifier::Tan => value_for_measurement.tan(),
+    Modifier::Atan => value_for_measurement.atan(),
     Modifier::SquareRoot => value.sqrt(),
   }
 }

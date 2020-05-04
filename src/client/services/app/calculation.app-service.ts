@@ -1,6 +1,14 @@
 import { send } from 'services/command-bus';
 
-import { MathOperation, Parentheses, NumberValue, MathConstant, PrefixModifier, ExpressionValue } from 'stores/types';
+import {
+  MathOperation,
+  Parentheses,
+  NumberValue,
+  MathConstant,
+  PrefixModifier,
+  ExpressionValue,
+  MeasurementType,
+} from 'stores/types';
 import { CommandType, Command } from 'services/types';
 
 import { validate, calculateResult as calculate } from 'services/event-handlers/calculation/calculation.store';
@@ -75,5 +83,12 @@ export async function calculateResult(expression: ExpressionValue[]): Promise<vo
     type: CommandType.CALCULATE_RESULT,
     expression,
     result,
+  });
+}
+
+export function setMeasurement(measurement: MeasurementType): void {
+  send({
+    type: CommandType.SET_MEASUREMENT,
+    measurement,
   });
 }

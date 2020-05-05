@@ -2,17 +2,18 @@ import { action, observable, computed } from 'mobx';
 
 import { handle } from 'services/event-bus';
 
-import { operationTexts } from 'texts';
+import { operationTexts, expressionTexts } from 'texts';
 
 import {
   ValueChangedEvent,
   OperationAddedEvent,
-  ModifierAddedEvent,
+  PrefixModifierAddedEvent,
+  PostfixModifierAddedEvent,
   ResultCalculatedEvent,
   MathConstantAddedEvent,
   EventType,
 } from 'services/types';
-import { PrefixModifier, MathConstant, ExpressionValue, MathOperation } from './types';
+import { PrefixModifier, MathConstant, ExpressionValue, MathOperation, PostfixModifier } from './types';
 
 type RepresentationValue = string | ExpressionValue;
 
@@ -28,15 +29,22 @@ const operationPresentation: {
 const prefixModifierRepresentation: {
   readonly [key in PrefixModifier]: RepresentationValue;
 } = {
-  [PrefixModifier.Sin]: 'sin(',
-  [PrefixModifier.Asin]: 'arcsin(',
-  [PrefixModifier.Ln]: 'ln(',
-  [PrefixModifier.Cos]: 'cos(',
-  [PrefixModifier.Acos]: 'arccos(',
-  [PrefixModifier.Log]: 'log(',
-  [PrefixModifier.Tan]: 'tan(',
-  [PrefixModifier.Atan]: 'arctan(',
-  [PrefixModifier.SquareRoot]: '√(',
+  [PrefixModifier.Sin]: `${expressionTexts.sin}${expressionTexts.leftParentheses}`,
+  [PrefixModifier.Asin]: `${expressionTexts.asin}${expressionTexts.leftParentheses}`,
+  [PrefixModifier.Ln]: `${expressionTexts.ln}${expressionTexts.leftParentheses}`,
+  [PrefixModifier.Cos]: `${expressionTexts.cos}${expressionTexts.leftParentheses}`,
+  [PrefixModifier.Acos]: `${expressionTexts.acos}${expressionTexts.leftParentheses}`,
+  [PrefixModifier.Log]: `${expressionTexts.log}${expressionTexts.leftParentheses}`,
+  [PrefixModifier.Tan]: `${expressionTexts.tan}${expressionTexts.leftParentheses}`,
+  [PrefixModifier.Atan]: `${expressionTexts.atan}${expressionTexts.leftParentheses}`,
+  [PrefixModifier.SquareRoot]: `${expressionTexts.squareRoot}${expressionTexts.leftParentheses}`,
+};
+
+const postfixModifierRepresentation: {
+  readonly [key in PostfixModifier]: RepresentationValue;
+} = {
+  [PostfixModifier.Factorial]: expressionTexts.factorial,
+  [PostfixModifier.Percent]: expressionTexts.percent,
 };
 
 const constantRepresentation: {
@@ -72,9 +80,10 @@ export class PresentationStore {
     handle(EventType.MATH_OPERATION_ADDED, this._handleOperationAdded);
     handle(EventType.LEFT_PARENTHESES_ADDED, this._handleLeftParenthesesAdded);
     handle(EventType.RIGHT_PARENTHESES_ADDED, this._handleRightParenthesesAdded);
-    handle(EventType.MODIFIER_ADDED, this._handleModifierAdded);
+    handle(EventType.PREFIX_MODIFIER_ADDED, this._handleModifierAdded);
     handle(EventType.MATH_CONSTANT_ADDED, this._handleMathConstantAdded);
     handle(EventType.RESULT_CALCULATED, this._handleResultCalculated);
+    handle(EventType.POSTFIX_MODIFIER_ADDED, this._handlePostfixModifierAdded);
   }
 
   @computed
@@ -146,7 +155,7 @@ export class PresentationStore {
   };
 
   @action
-  private _handleModifierAdded = ({ modifier }: ModifierAddedEvent): void => {
+  private _handleModifierAdded = ({ modifier }: PrefixModifierAddedEvent): void => {
     this._addToExpression(` ${prefixModifierRepresentation[modifier]}`);
     this._notClosedParentheses += 1;
   };
@@ -170,5 +179,10 @@ export class PresentationStore {
     this._expression = [];
     this._notClosedParentheses = 0;
     this._result = '';
+  };
+
+  @action
+  private _handlePostfixModifierAdded = ({ modifier }: PostfixModifierAddedEvent): void => {
+    this._addToExpression(postfixModifierRepresentation[modifier]);
   };
 }

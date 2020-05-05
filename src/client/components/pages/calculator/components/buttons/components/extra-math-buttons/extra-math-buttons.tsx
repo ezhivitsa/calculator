@@ -3,7 +3,7 @@ import React, { ReactElement, ReactNode } from 'react';
 import { Button } from 'components/global/button';
 
 import { Parentheses, PostfixModifier } from 'stores';
-import { addParentheses, addModifier } from 'services/app/calculation.app-service';
+import { addParentheses, addPostfixModifier } from 'services/app/calculation.app-service';
 
 import { buttonTexts } from 'texts';
 
@@ -15,7 +15,7 @@ export function ExtraMathButtons(): ReactElement {
   }
 
   function handleModifierClick(modifier: PostfixModifier): void {
-    // addModifier(modifier);
+    addPostfixModifier(modifier);
   }
 
   const buttons = [

@@ -21,9 +21,8 @@ export enum MathModifier {
 }
 
 export enum PostfixModifier {
-  Percent,
   Factorial,
-  Exp,
+  Percent,
 }
 
 export enum PrefixModifier {

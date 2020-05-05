@@ -8,7 +8,7 @@ use std::cell::RefCell;
 use phf::phf_map;
 
 pub mod node;
-pub use node::{MathOperation, Modifier, Measurement};
+pub use node::{MathOperation, PrefixModifier, Measurement, PostfixModifier};
 use node::{Node, Value};
 
 use wasm_bindgen::prelude::*;
@@ -157,12 +157,12 @@ impl CalculationData {
     self.expressions_stack.push(expression.clone());
   }
 
-  pub fn add_prefix_modifier(&mut self, modifier: Modifier) {
+  pub fn add_prefix_modifier(&mut self, modifier: PrefixModifier) {
     self.prepare_to_add_constant();
 
     let left = {
       let mut expression = self.expression.borrow_mut();
-      expression.set_value(Value::Modifier(modifier));
+      expression.set_value(Value::PrefixModifier(modifier));
   
       self.expressions_stack.push(self.expression.clone());
   
@@ -173,6 +173,16 @@ impl CalculationData {
       left.clone()
     };
     self.expression = left;
+  }
+
+  pub fn add_postfix_modifier(&mut self, modifier: PostfixModifier) {
+    let mut expression = self.expression.borrow_mut();
+
+    let left = expression.clone();
+
+    expression.set_value(Value::PostfixModifier(modifier));
+    expression.set_left(Rc::new(RefCell::new(left)));
+    expression.clear_right();
   }
 
   pub fn set_measurement(&mut self, measurement: Measurement) {

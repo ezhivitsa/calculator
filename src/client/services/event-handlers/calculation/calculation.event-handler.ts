@@ -4,10 +4,11 @@ import {
   EventType,
   MathConstantAddedEvent,
   OperationAddedEvent,
-  ModifierAddedEvent,
+  PrefixModifierAddedEvent,
   ResultCalculatedEvent,
   ValueChangedEvent,
   MeasurementChangedEvent,
+  PostfixModifierAddedEvent,
 } from 'services/types';
 
 import {
@@ -17,8 +18,9 @@ import {
   setValue,
   clean,
   addConstant,
-  addModifier,
+  addPrefixModifier,
   setMeasurement,
+  addPostfixModifier,
 } from './calculation.store';
 
 handle(EventType.INITIALIZED, (): void => {
@@ -41,8 +43,12 @@ handle(EventType.MATH_OPERATION_ADDED, ({ operation }: OperationAddedEvent): voi
   addOperation(operation);
 });
 
-handle(EventType.MODIFIER_ADDED, (event: ModifierAddedEvent): void => {
-  addModifier(event.modifier);
+handle(EventType.PREFIX_MODIFIER_ADDED, ({ modifier }: PrefixModifierAddedEvent): void => {
+  addPrefixModifier(modifier);
+});
+
+handle(EventType.POSTFIX_MODIFIER_ADDED, ({ modifier }: PostfixModifierAddedEvent): void => {
+  addPostfixModifier(modifier);
 });
 
 // handle(EventType.RESULT_CALCULATED, (event: ResultCalculatedEvent): void => {});

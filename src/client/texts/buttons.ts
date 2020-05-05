@@ -16,6 +16,7 @@ export const buttonTexts = {
   square: '2',
   rnd: 'Rnd',
   percent: '%',
+  factorial: '!',
 };
 
 export const measurementTypeTexts = {

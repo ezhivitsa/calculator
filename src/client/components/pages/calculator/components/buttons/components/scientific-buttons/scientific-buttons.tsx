@@ -1,8 +1,13 @@
 import React, { useState, ReactElement, ReactNode } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { PrefixModifier, MathConstant, MeasurementType } from 'stores';
-import { addModifier, addConstant, setMeasurement } from 'services/app/calculation.app-service';
+import { PrefixModifier, MathConstant, MeasurementType, PostfixModifier } from 'stores';
+import {
+  addPrefixModifier,
+  addConstant,
+  setMeasurement,
+  addPostfixModifier,
+} from 'services/app/calculation.app-service';
 
 import { useCalculatorStore } from 'providers';
 
@@ -16,7 +21,7 @@ import styles from './scientific-buttons.pcss';
 interface Button {
   title: ReactNode;
   onClick?: () => void;
-  inverse: boolean | null;
+  inverse?: boolean;
 }
 
 export const ScientificButtons = observer(
@@ -25,7 +30,7 @@ export const ScientificButtons = observer(
     const calculator = useCalculatorStore();
 
     function handleModifierClick(modifier: PrefixModifier): void {
-      addModifier(modifier);
+      addPrefixModifier(modifier);
       setShowInverse(false);
     }
 
@@ -41,10 +46,17 @@ export const ScientificButtons = observer(
       setMeasurement(measurement);
     }
 
+    function handlePostfixModifierClick(modifier: PostfixModifier): void {
+      addPostfixModifier(modifier);
+    }
+
     const buttons: Button[] = [
       {
+        title: `${buttonTexts.x}${buttonTexts.factorial}`,
+        onClick: () => handlePostfixModifierClick(PostfixModifier.Factorial),
+      },
+      {
         title: buttonTexts.inversion,
-        inverse: null,
         onClick: handleInverseClick,
       },
       {
@@ -78,7 +90,6 @@ export const ScientificButtons = observer(
       },
       {
         title: buttonTexts.pi,
-        inverse: null,
         onClick: () => handleConstantClick(MathConstant.PI),
       },
       {
@@ -112,7 +123,6 @@ export const ScientificButtons = observer(
       },
       {
         title: buttonTexts.e,
-        inverse: null,
         onClick: () => handleConstantClick(MathConstant.E),
       },
       {
@@ -156,7 +166,6 @@ export const ScientificButtons = observer(
       },
       {
         title: buttonTexts.exp,
-        inverse: null,
       },
       {
         title: (
@@ -183,7 +192,7 @@ export const ScientificButtons = observer(
 
     function renderButtons(): ReactNode[] {
       return buttons
-        .filter((button) => button.inverse === null || button.inverse === showInverse)
+        .filter((button) => button.inverse === undefined || button.inverse === showInverse)
         .map(
           (button, index): ReactNode => {
             return (

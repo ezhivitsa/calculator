@@ -4,7 +4,7 @@ use wasm_bindgen_test::{wasm_bindgen_test_configure};
 wasm_bindgen_test_configure!(run_in_browser);
 
 extern crate calculator;
-use calculator::calculation_data::{CalculationData, MathOperation, Modifier};
+use calculator::calculation_data::{CalculationData, MathOperation, PrefixModifier};
 
 #[test]
 fn should_calculate_sum_of_numbers() {
@@ -95,7 +95,7 @@ fn should_calculate_expression_with_modifiers() {
   calculation_data.set_value(&"1");
   calculation_data.set_operation(MathOperation::Plus);
 
-  calculation_data.add_prefix_modifier(Modifier::Sin);
+  calculation_data.add_prefix_modifier(PrefixModifier::Sin);
   calculation_data.add_constant("pi");
   calculation_data.set_operation(MathOperation::Divide);
   calculation_data.add_constant("2");
@@ -103,7 +103,7 @@ fn should_calculate_expression_with_modifiers() {
 
   calculation_data.set_operation(MathOperation::Minus);
 
-  calculation_data.add_prefix_modifier(Modifier::Ln);
+  calculation_data.add_prefix_modifier(PrefixModifier::Ln);
   calculation_data.add_constant("e");
   calculation_data.add_right_parentheses();
 

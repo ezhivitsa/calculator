@@ -1,7 +1,7 @@
 import { isNumber } from 'lib/numbers';
 
 import { NumberValue, MathOperation } from 'stores/types';
-import { ValueChangedEvent, OperationAddedEvent, ModifierAddedEvent, EventType } from 'services/types';
+import { ValueChangedEvent, OperationAddedEvent, PrefixModifierAddedEvent, EventType } from 'services/types';
 
 import { handle } from 'services/event-bus';
 
@@ -68,7 +68,7 @@ handle(EventType.RIGHT_PARENTHESES_ADDED, (): void => {
   stateData.numOpenedParentheses -= 1;
 });
 
-handle(EventType.MODIFIER_ADDED, (): void => {
+handle(EventType.PREFIX_MODIFIER_ADDED, (): void => {
   stateData.hasValues = true;
   stateData.current = {
     ...initialCurrent,

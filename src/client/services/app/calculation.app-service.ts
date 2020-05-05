@@ -8,6 +8,7 @@ import {
   PrefixModifier,
   ExpressionValue,
   MeasurementType,
+  PostfixModifier,
 } from 'stores/types';
 import { CommandType, Command } from 'services/types';
 
@@ -33,9 +34,16 @@ export function addAction(action: MathOperation): void {
   });
 }
 
-export function addModifier(modifier: PrefixModifier): void {
+export function addPrefixModifier(modifier: PrefixModifier): void {
   send({
-    type: CommandType.ADD_MODIFIER,
+    type: CommandType.ADD_PREFIX_MODIFIER,
+    modifier,
+  });
+}
+
+export function addPostfixModifier(modifier: PostfixModifier): void {
+  send({
+    type: CommandType.ADD_POSTFIX_MODIFIER,
     modifier,
   });
 }

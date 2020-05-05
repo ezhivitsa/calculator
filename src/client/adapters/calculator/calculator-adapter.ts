@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
 import type { CalculationData } from 'pkg/calculator';
-import { MathOperation, PrefixModifier, MeasurementType } from 'stores/types';
+import { MathOperation, PrefixModifier, MeasurementType, PostfixModifier } from 'stores/types';
 
 type Action<T> = {
   resolve: (data: T) => void;
@@ -107,6 +107,12 @@ export class CalculatorAdapter {
   addPrefixModifier(modifier: PrefixModifier): void | Promise<void> {
     return this._waitInitInstance((instance: CalculationData) => {
       return instance.add_prefix_modifier(modifier);
+    });
+  }
+
+  addPostfixModifier(modifier: PostfixModifier): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.add_postfix_modifier(modifier);
     });
   }
 

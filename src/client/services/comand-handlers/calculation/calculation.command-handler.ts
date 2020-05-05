@@ -1,13 +1,14 @@
 import { MathConstant, MathOperation } from 'stores/types';
 import {
   AddMathOperationCommand,
-  AddModifierCommand,
+  AddPrefixModifierCommand,
   AddConstantCommand,
   EventType,
   CommandType,
   CommandTypeMapping,
   CalculateResultCommand,
   SetMeasurementCommand,
+  AddPostfixModifierCommand,
 } from 'services/types';
 
 import { handle } from 'services/command-bus';
@@ -105,9 +106,16 @@ handle(CommandType.REMOVE_ALL_SYMBOLS, (): void => {
   restore();
 });
 
-handle(CommandType.ADD_MODIFIER, (command: AddModifierCommand): void => {
+handle(CommandType.ADD_PREFIX_MODIFIER, (command: AddPrefixModifierCommand): void => {
   apply({
-    type: EventType.MODIFIER_ADDED,
+    type: EventType.PREFIX_MODIFIER_ADDED,
+    modifier: command.modifier,
+  });
+});
+
+handle(CommandType.ADD_POSTFIX_MODIFIER, (command: AddPostfixModifierCommand): void => {
+  apply({
+    type: EventType.POSTFIX_MODIFIER_ADDED,
     modifier: command.modifier,
   });
 });

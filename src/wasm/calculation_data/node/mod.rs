@@ -2,16 +2,20 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 pub mod math_operation;
-pub use math_operation::{MathOperation};
+pub use math_operation::MathOperation;
 
-pub mod modifier;
-pub use modifier::{Modifier, Measurement};
+pub mod prefix_modifier;
+pub use prefix_modifier::{PrefixModifier, Measurement};
+
+pub mod postfix_modifier;
+pub use postfix_modifier::PostfixModifier;
 
 pub enum Value {
   None,
   Float(f64),
   Operation(MathOperation),
-  Modifier(Modifier)
+  PrefixModifier(PrefixModifier),
+  PostfixModifier(PostfixModifier),
 }
 
 pub struct Node {
@@ -41,6 +45,32 @@ impl Node {
     self.right = Some(node);
   }
 
+  pub fn clear_right(&mut self) {
+    self.right = None;
+  }
+
+  fn get_left_value(&self, measurement: &Measurement, error_message: &str) -> f64 {
+    match &self.left {
+      Some(node) => {
+        node.borrow().get_value(measurement)
+      },
+      None => {
+        panic!(String::from(error_message));
+      }
+    }
+  }
+
+  fn get_right_value(&self, measurement: &Measurement, error_message: &str) -> f64 {
+    match &self.right {
+      Some(node) => {
+        node.borrow().get_value(measurement)
+      },
+      None => {
+        panic!(String::from(error_message));
+      }
+    }
+  }
+
   pub fn get_value(&self, measurement: &Measurement) -> f64 {
     match &self.value {
       Value::Float(value) => {
@@ -48,38 +78,32 @@ impl Node {
       },
 
       Value::Operation(operation) => {
-        let left_value = match &self.left {
-          Some(node) => {
-            node.borrow().get_value(measurement)
-          },
-          None => {
-            panic!("Error when get left_value");
-          }
-        };
-
-        let right_value = match &self.right {
-          Some(node) => {
-            node.borrow().get_value(measurement)
-          },
-          None => {
-            panic!("Error when get right_value");
-          }
-        };
+        let left_value = self.get_left_value(
+          measurement,
+          "Error when get left_value"
+        );
+        let right_value = self.get_right_value(
+          measurement,
+          "Error when get right_value"
+        );
 
         math_operation::apply_operation(&left_value, &right_value, operation)
       },
 
-      Value::Modifier(modifier) => {
-        let left_value = match &self.left {
-          Some(node) => {
-            node.borrow().get_value(measurement)
-          },
-          None => {
-            panic!("Error when get expression for modifier");
-          }
-        };
+      Value::PrefixModifier(modifier) => {
+        let left_value = self.get_left_value(
+          measurement,
+          "Error when get expression for prefix modifier"
+        );
+        prefix_modifier::apply_modifier(&left_value, modifier, measurement)
+      },
 
-        modifier::apply_modifier(&left_value, modifier, measurement)
+      Value::PostfixModifier(modifier) => {
+        let left_value = self.get_left_value(
+          measurement,
+          "Error when get expression for postfix modifier"
+        );
+        postfix_modifier::apply_modifier(&left_value, modifier)
       },
 
       Value::None => {
@@ -95,6 +119,28 @@ impl Node {
     }
   }
 
+  fn validate_left(&self) -> bool {
+    match &self.left {
+      Some(node) => {
+        node.borrow().validate()
+      },
+      None => {
+        false
+      }
+    }
+  }
+
+  fn validate_right(&self) -> bool {
+    match &self.right {
+      Some(node) => {
+        node.borrow().validate()
+      },
+      None => {
+        false
+      }
+    }
+  }
+
   pub fn validate(&self) -> bool {
     match &self.value {
       Value::Float(_) => {
@@ -102,37 +148,19 @@ impl Node {
       },
 
       Value::Operation(_) => {
-        let left_valid = match &self.left {
-          Some(node) => {
-            node.borrow().validate()
-          },
-          None => {
-            false
-          }
-        };
-
-        let right_valid = match &self.right {
-          Some(node) => {
-            node.borrow().validate()
-          },
-          None => {
-            false
-          }
-        };
+        let left_valid = self.validate_left();
+        let right_valid = self.validate_right();
 
         left_valid && right_valid
       },
 
-      Value::Modifier(_) => {
-        match &self.left {
-          Some(node) => {
-            node.borrow().validate()
-          },
-          None => {
-            false
-          }
-        }
+      Value::PrefixModifier(_) => {
+        self.validate_left()
       },
+
+      Value::PostfixModifier(_) => {
+        self.validate_left()
+      }
 
       Value::None => {
         false
@@ -145,7 +173,8 @@ impl Node {
       Value::None => Value::None,
       Value::Float(val) => Value::Float(*val),
       Value::Operation(operation) => Value::Operation(math_operation::copy_operation(operation)),
-      Value::Modifier(modifier) => Value::Modifier(modifier::copy_modifier(modifier))
+      Value::PrefixModifier(modifier) => Value::PrefixModifier(prefix_modifier::copy_modifier(modifier)),
+      Value::PostfixModifier(modifier) => Value::PostfixModifier(postfix_modifier::copy_modifier(modifier))
     }
   }
 
@@ -169,7 +198,7 @@ impl Node {
 
   pub fn has_value(&self) -> bool {
     match &self.value {
-      Value::Float(_) | Value::Modifier(_) => true,
+      Value::Float(_) | Value::PrefixModifier(_) | Value::PostfixModifier(_) => true,
       Value::None | Value::Operation(_) => false
     }
   }

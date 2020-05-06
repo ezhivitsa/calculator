@@ -110,3 +110,42 @@ fn should_calculate_expression_with_modifiers() {
   // 1 + sin(pi / 2) - ln(e) == 1
   assert_eq!(calculation_data.calculate(), "1");
 }
+
+#[test]
+fn should_calculate_value_with_exponent() {
+  let mut calculation_data = CalculationData::new();
+
+  calculation_data.set_value("2");
+  calculation_data.set_operation(MathOperation::Plus);
+  calculation_data.set_value("5");
+  calculation_data.add_exp();
+  calculation_data.set_power("2");
+  calculation_data.set_operation(MathOperation::Divide);
+  calculation_data.set_value("5");
+
+  // 2 + 5E2 / 5 == 102
+  assert_eq!(calculation_data.calculate(), "102");
+}
+
+#[test]
+fn should_calculate_double_power() {
+  let mut calculation_data = CalculationData::new();
+
+  calculation_data.set_value("2");
+  calculation_data.add_power();
+
+  calculation_data.add_left_parentheses();
+  calculation_data.set_value("2");
+  calculation_data.set_operation(MathOperation::Plus);
+  calculation_data.set_value("1");
+  calculation_data.add_right_parentheses();
+
+  calculation_data.add_power();
+  calculation_data.set_value("2");
+
+  calculation_data.set_operation(MathOperation::Plus);
+  calculation_data.set_value("1");
+
+  // 2 ^ (2 + 1) ^ 2 + 1 == 513
+  assert_eq!(calculation_data.calculate(), "513");
+}

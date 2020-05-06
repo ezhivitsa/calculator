@@ -108,7 +108,7 @@ impl CalculationData {
   fn prepare_to_add_constant(&mut self) {
     let should_add_operation = {
       let expression = self.expression.borrow();
-      expression.has_value()
+      !expression.is_operation_or_none()
     };
 
     if should_add_operation {
@@ -187,5 +187,37 @@ impl CalculationData {
 
   pub fn set_measurement(&mut self, measurement: Measurement) {
     self.measurement = measurement;
+  }
+
+  fn add_power_node(&mut self) -> Rc<RefCell<Node>> {
+    let mut expression = self.expression.borrow_mut();
+  
+    let left = expression.clone();
+    let right = Rc::new(RefCell::new(Node::new()));
+  
+    expression.set_value(Value::Power);
+    expression.set_left(Rc::new(RefCell::new(left)));
+    expression.set_right(right.clone());
+
+    right.clone()
+  }
+
+  pub fn add_power(&mut self) {
+    let right = self.add_power_node();
+    self.expression = right;
+  }
+
+  pub fn set_power(&mut self, power: &str) {
+    let value_num = parse_float(power);
+
+    let mut expression = self.expression.borrow_mut();
+    expression.set_right_value(Value::Float(value_num));
+  }
+
+  pub fn add_exp(&mut self) {
+    self.set_operation(MathOperation::Multiply);
+    self.set_value("10");
+    self.add_power_node();
+    self.set_power("0");
   }
 }

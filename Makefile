@@ -16,3 +16,6 @@ deps:
 
 lint-styles:
 	npx stylelint "src/client/**/*.pcss"
+
+test:
+	cargo test

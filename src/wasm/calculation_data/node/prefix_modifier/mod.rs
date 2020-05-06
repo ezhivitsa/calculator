@@ -1,5 +1,3 @@
-use std::f64::consts::PI;
-
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

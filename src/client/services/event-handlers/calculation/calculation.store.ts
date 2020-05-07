@@ -47,3 +47,11 @@ export function addPostfixModifier(modifier: PostfixModifier): void {
 export function setMeasurement(measurement: MeasurementType): void {
   adapter.setMeasurement(measurement);
 }
+
+export function addExponent(): void {
+  adapter.addExponent();
+}
+
+export function setExponentPower(power: string): void {
+  adapter.setExponent(power);
+}

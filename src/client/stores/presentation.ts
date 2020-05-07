@@ -12,6 +12,7 @@ import {
   ResultCalculatedEvent,
   MathConstantAddedEvent,
   EventType,
+  ExponentValueChangedEvent,
 } from 'services/types';
 import { PrefixModifier, MathConstant, ExpressionValue, MathOperation, PostfixModifier } from './types';
 
@@ -84,6 +85,8 @@ export class PresentationStore {
     handle(EventType.MATH_CONSTANT_ADDED, this._handleMathConstantAdded);
     handle(EventType.RESULT_CALCULATED, this._handleResultCalculated);
     handle(EventType.POSTFIX_MODIFIER_ADDED, this._handlePostfixModifierAdded);
+    handle(EventType.EXPONENT_ADDED, this._handleExponentAdded);
+    handle(EventType.EXPONENT_VALUE_CHANGED, this._handleExponentValueChanged);
   }
 
   @computed
@@ -184,5 +187,15 @@ export class PresentationStore {
   @action
   private _handlePostfixModifierAdded = ({ modifier }: PostfixModifierAddedEvent): void => {
     this._addToExpression(postfixModifierRepresentation[modifier]);
+  };
+
+  @action
+  private _handleExponentAdded = (): void => {
+    this._addToExpression(expressionTexts.exponent);
+  };
+
+  @action
+  private _handleExponentValueChanged = ({ addedValue }: ExponentValueChangedEvent): void => {
+    this._addToExpression(addedValue);
   };
 }

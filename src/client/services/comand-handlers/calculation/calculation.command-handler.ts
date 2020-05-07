@@ -22,6 +22,8 @@ import {
   canAddSign,
   canAddOperation,
   canAddRightParentheses,
+  isCurrentNumber,
+  newExponentValue,
 } from './calculation.state';
 
 import { restore } from 'services/event-bus';
@@ -36,6 +38,16 @@ handle(CommandType.INIT, (): void => {
 });
 
 handle(CommandType.ADD_VALUE, (command: CommandTypeMapping[CommandType.ADD_VALUE]): void => {
+  const exponentValue = newExponentValue(command.value);
+  if (exponentValue !== null) {
+    apply({
+      type: EventType.EXPONENT_VALUE_CHANGED,
+      addedValue: command.value,
+      value: exponentValue,
+    });
+    return;
+  }
+
   if (shouldAddMultiplyForConstant()) {
     if (!isValueNumber(command.value)) {
       return;
@@ -51,6 +63,7 @@ handle(CommandType.ADD_VALUE, (command: CommandTypeMapping[CommandType.ADD_VALUE
     });
     return;
   }
+
   const resultValue = newValue(command.value);
   if (!resultValue) {
     return;
@@ -171,5 +184,15 @@ handle(CommandType.SET_MEASUREMENT, (command: SetMeasurementCommand): void => {
   apply({
     type: EventType.MEASUREMENT_CHANGED,
     measurement: command.measurement,
+  });
+});
+
+handle(CommandType.ADD_EXPONENT, (): void => {
+  if (!isCurrentNumber()) {
+    return;
+  }
+
+  apply({
+    type: EventType.EXPONENT_ADDED,
   });
 });

@@ -22,6 +22,7 @@ export enum CommandType {
   CALCULATE_RESULT = 'calculate-result',
   ADD_MATH_CONSTANT = 'add-math-constant',
   SET_MEASUREMENT = 'set-measurement',
+  ADD_EXPONENT = 'add-exponent',
 }
 
 export interface BaseCommand {
@@ -80,6 +81,7 @@ export type CommandTypeMapping = {
   [CommandType.CALCULATE_RESULT]: CalculateResultCommand;
   [CommandType.ADD_MATH_CONSTANT]: AddConstantCommand;
   [CommandType.SET_MEASUREMENT]: SetMeasurementCommand;
+  [CommandType.ADD_EXPONENT]: BaseCommand;
 };
 
 // Events
@@ -95,6 +97,8 @@ export enum EventType {
   RESULT_CALCULATED = 'result-calculated',
   MATH_CONSTANT_ADDED = 'math-constant-added',
   MEASUREMENT_CHANGED = 'measurement-changed',
+  EXPONENT_ADDED = 'exponent-added',
+  EXPONENT_VALUE_CHANGED = 'exponent-value-changed',
 }
 
 export interface BaseEvent {
@@ -133,6 +137,11 @@ export interface PostfixModifierAddedEvent extends BaseEvent {
   modifier: PostfixModifier;
 }
 
+export interface ExponentValueChangedEvent extends BaseEvent {
+  addedValue: string;
+  value: string;
+}
+
 export type Event =
   | BaseEvent
   | ValueChangedEvent
@@ -141,7 +150,8 @@ export type Event =
   | ResultCalculatedEvent
   | MathConstantAddedEvent
   | MeasurementChangedEvent
-  | PostfixModifierAddedEvent;
+  | PostfixModifierAddedEvent
+  | ExponentValueChangedEvent;
 
 export type EventTypeMapping = {
   [EventType.INITIALIZED]: BaseEvent;
@@ -154,4 +164,6 @@ export type EventTypeMapping = {
   [EventType.RESULT_CALCULATED]: ResultCalculatedEvent;
   [EventType.MATH_CONSTANT_ADDED]: MathConstantAddedEvent;
   [EventType.MEASUREMENT_CHANGED]: MeasurementChangedEvent;
+  [EventType.EXPONENT_ADDED]: BaseEvent;
+  [EventType.EXPONENT_VALUE_CHANGED]: ExponentValueChangedEvent;
 };

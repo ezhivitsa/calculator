@@ -1,1 +1,1 @@
-export { isNumber } from './numbers';
+export { isNumber, isNaturalNumber } from './numbers';

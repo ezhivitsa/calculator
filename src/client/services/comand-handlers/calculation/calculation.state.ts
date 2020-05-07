@@ -1,7 +1,7 @@
-import { isNumber } from 'lib/numbers';
+import { isNumber, isNaturalNumber } from 'lib/numbers';
 
 import { NumberValue, MathOperation } from 'stores/types';
-import { ValueChangedEvent, OperationAddedEvent, PrefixModifierAddedEvent, EventType } from 'services/types';
+import { ValueChangedEvent, OperationAddedEvent, EventType, ExponentValueChangedEvent } from 'services/types';
 
 import { handle } from 'services/event-bus';
 
@@ -12,6 +12,8 @@ interface Current {
   hasMinusSign: boolean;
   action: MathOperation | null;
   isValueConstant: boolean;
+  isExponentValue: boolean;
+  exponentValue: string;
 }
 
 interface StateData {
@@ -25,6 +27,8 @@ const initialCurrent: Current = {
   hasMinusSign: false,
   action: null,
   isValueConstant: false,
+  isExponentValue: false,
+  exponentValue: '',
 };
 
 const stateData: StateData = {
@@ -81,6 +85,14 @@ handle(EventType.MATH_CONSTANT_ADDED, (): void => {
   stateData.current.isValueConstant = true;
 });
 
+handle(EventType.EXPONENT_ADDED, (): void => {
+  stateData.current.isExponentValue = true;
+});
+
+handle(EventType.EXPONENT_VALUE_CHANGED, (event: ExponentValueChangedEvent): void => {
+  stateData.current.exponentValue = event.value;
+});
+
 export function newValue(value: string): string | null {
   const newValue =
     !stateData.hasValues && !stateData.current.value && value === NumberValue.DOT
@@ -123,4 +135,19 @@ export function shouldAddMultiplyForConstant(): boolean {
 
 export function isValueNumber(value: string): boolean {
   return isNumber(value);
+}
+
+export function isCurrentNumber(): boolean {
+  const { value, action, isValueConstant } = stateData.current;
+
+  return isNumber(value) && action === null && !isValueConstant;
+}
+
+export function newExponentValue(value: string): string | null {
+  if (!stateData.current.isExponentValue) {
+    return null;
+  }
+
+  const newValue = stateData.current.exponentValue + value;
+  return isNaturalNumber(newValue) ? newValue : null;
 }

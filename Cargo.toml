@@ -8,6 +8,7 @@ categories = ["wasm"]
 readme = "README.md"
 edition = "2018"
 license = "MIT"
+repository = "https://github.com/ezhivitsa/calculator"
 
 [lib]
 crate-type = ["rlib", "cdylib"]

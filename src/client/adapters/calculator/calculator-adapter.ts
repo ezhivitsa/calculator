@@ -127,4 +127,16 @@ export class CalculatorAdapter {
       return instance.set_measurement(measurement);
     });
   }
+
+  addExponent(): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.add_exp();
+    });
+  }
+
+  setExponent(exponentValue: string): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.set_power(exponentValue);
+    });
+  }
 }

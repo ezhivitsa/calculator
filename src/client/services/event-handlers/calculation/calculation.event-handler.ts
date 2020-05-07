@@ -5,10 +5,10 @@ import {
   MathConstantAddedEvent,
   OperationAddedEvent,
   PrefixModifierAddedEvent,
-  ResultCalculatedEvent,
   ValueChangedEvent,
   MeasurementChangedEvent,
   PostfixModifierAddedEvent,
+  ExponentValueChangedEvent,
 } from 'services/types';
 
 import {
@@ -21,6 +21,8 @@ import {
   addPrefixModifier,
   setMeasurement,
   addPostfixModifier,
+  addExponent,
+  setExponentPower,
 } from './calculation.store';
 
 handle(EventType.INITIALIZED, (): void => {
@@ -51,12 +53,18 @@ handle(EventType.POSTFIX_MODIFIER_ADDED, ({ modifier }: PostfixModifierAddedEven
   addPostfixModifier(modifier);
 });
 
-// handle(EventType.RESULT_CALCULATED, (event: ResultCalculatedEvent): void => {});
-
 handle(EventType.VALUE_CHANGED, ({ value }: ValueChangedEvent): void => {
   setValue(value);
 });
 
 handle(EventType.MEASUREMENT_CHANGED, ({ measurement }: MeasurementChangedEvent): void => {
   setMeasurement(measurement);
+});
+
+handle(EventType.EXPONENT_ADDED, (): void => {
+  addExponent();
+});
+
+handle(EventType.EXPONENT_VALUE_CHANGED, ({ value }: ExponentValueChangedEvent): void => {
+  setExponentPower(value);
 });

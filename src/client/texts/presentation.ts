@@ -11,4 +11,5 @@ export const expressionTexts = {
   leftParentheses: '(',
   factorial: '!',
   percent: '%',
+  exponent: 'E',
 };

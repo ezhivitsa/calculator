@@ -100,3 +100,9 @@ export function setMeasurement(measurement: MeasurementType): void {
     measurement,
   });
 }
+
+export function addExponent(): void {
+  send({
+    type: CommandType.ADD_EXPONENT,
+  });
+}

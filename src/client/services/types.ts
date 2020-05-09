@@ -23,6 +23,7 @@ export enum CommandType {
   ADD_MATH_CONSTANT = 'add-math-constant',
   SET_MEASUREMENT = 'set-measurement',
   ADD_EXPONENT = 'add-exponent',
+  ADD_POWER = 'add-power',
 }
 
 export interface BaseCommand {
@@ -82,6 +83,7 @@ export type CommandTypeMapping = {
   [CommandType.ADD_MATH_CONSTANT]: AddConstantCommand;
   [CommandType.SET_MEASUREMENT]: SetMeasurementCommand;
   [CommandType.ADD_EXPONENT]: BaseCommand;
+  [CommandType.ADD_POWER]: BaseCommand;
 };
 
 // Events
@@ -99,6 +101,7 @@ export enum EventType {
   MEASUREMENT_CHANGED = 'measurement-changed',
   EXPONENT_ADDED = 'exponent-added',
   EXPONENT_VALUE_CHANGED = 'exponent-value-changed',
+  POWER_ADDED = 'power-added',
 }
 
 export interface BaseEvent {
@@ -166,4 +169,5 @@ export type EventTypeMapping = {
   [EventType.MEASUREMENT_CHANGED]: MeasurementChangedEvent;
   [EventType.EXPONENT_ADDED]: BaseEvent;
   [EventType.EXPONENT_VALUE_CHANGED]: ExponentValueChangedEvent;
+  [EventType.POWER_ADDED]: BaseEvent;
 };

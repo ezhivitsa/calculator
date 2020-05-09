@@ -106,3 +106,9 @@ export function addExponent(): void {
     type: CommandType.ADD_EXPONENT,
   });
 }
+
+export function addPower(): void {
+  send({
+    type: CommandType.ADD_POWER,
+  });
+}

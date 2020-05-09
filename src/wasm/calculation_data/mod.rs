@@ -16,6 +16,7 @@ use wasm_bindgen::prelude::*;
 static MATH_CONSTANTS_MAP: phf::Map<&'static str, f64> = phf_map! {
   "pi" => PI,
   "e" => E,
+  "." => 0.0
 };
 
 fn parse_float(value: &str) -> f64 {
@@ -69,6 +70,11 @@ impl CalculationData {
 
   fn set_non_priority_operation(&mut self, operation: MathOperation) {
     let right = self.set_priority_operation(operation);
+
+    if self.expressions_stack.len() > 1 {
+      self.expressions_stack.pop();
+    }
+
     self.expressions_stack.push(right);
   }
 
@@ -119,16 +125,18 @@ impl CalculationData {
   pub fn add_left_parentheses(&mut self) {
     let should_add_multiply = self.should_add_multiply_before_parentheses();
     if should_add_multiply {
-        self.set_operation(MathOperation::Multiply);
+      self.set_operation(MathOperation::Multiply);
     }
 
     let current_expression = self.expression.clone();
+    self.expressions_stack.push(current_expression.clone());
     self.expressions_stack.push(current_expression.clone());
   }
 
   pub fn add_right_parentheses(&mut self) {
     self.expressions_stack.pop();
     let root_expression = self.expressions_stack.pop().unwrap();
+
     self.expression = root_expression.clone();
   }
 

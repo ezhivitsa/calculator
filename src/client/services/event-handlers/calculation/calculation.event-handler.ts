@@ -23,6 +23,7 @@ import {
   addPostfixModifier,
   addExponent,
   setExponentPower,
+  addPower,
 } from './calculation.store';
 
 handle(EventType.INITIALIZED, (): void => {
@@ -67,4 +68,8 @@ handle(EventType.EXPONENT_ADDED, (): void => {
 
 handle(EventType.EXPONENT_VALUE_CHANGED, ({ value }: ExponentValueChangedEvent): void => {
   setExponentPower(value);
+});
+
+handle(EventType.POWER_ADDED, (): void => {
+  addPower();
 });

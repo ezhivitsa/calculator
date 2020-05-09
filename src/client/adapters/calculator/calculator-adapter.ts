@@ -139,4 +139,10 @@ export class CalculatorAdapter {
       return instance.set_power(exponentValue);
     });
   }
+
+  addPower(): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.add_power();
+    });
+  }
 }

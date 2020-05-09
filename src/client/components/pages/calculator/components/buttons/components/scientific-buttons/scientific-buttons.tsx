@@ -8,6 +8,7 @@ import {
   setMeasurement,
   addPostfixModifier,
   addExponent,
+  addPower,
 } from 'services/app/calculation.app-service';
 
 import { useCalculatorStore } from 'providers';
@@ -53,6 +54,10 @@ export const ScientificButtons = observer(
 
     function handleExpClick(): void {
       addExponent();
+    }
+
+    function handleAddPower(): void {
+      addPower();
     }
 
     const buttons: Button[] = [
@@ -181,6 +186,7 @@ export const ScientificButtons = observer(
           </span>
         ),
         inverse: false,
+        onClick: handleAddPower,
       },
       {
         title: (

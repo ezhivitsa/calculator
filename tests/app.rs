@@ -1,6 +1,5 @@
 use wasm_bindgen_test::{wasm_bindgen_test_configure};
 
-// mod calculation_data;
 wasm_bindgen_test_configure!(run_in_browser);
 
 extern crate calculator;
@@ -148,4 +147,60 @@ fn should_calculate_double_power() {
 
   // 2 ^ (2 + 1) ^ 2 + 1 == 513
   assert_eq!(calculation_data.calculate(), "513");
+}
+
+#[test]
+fn should_return_value_from_parentheses() {
+  let mut calculation_data = CalculationData::new();
+
+  calculation_data.add_left_parentheses();
+  calculation_data.set_value("7");
+  calculation_data.add_right_parentheses();
+
+  // (7) == 7
+  assert_eq!(calculation_data.calculate(), "7");
+}
+
+#[test]
+fn should_calculate_multiply_with_parentheses() {
+  let mut calculation_data = CalculationData::new();
+
+  calculation_data.set_value("2");
+  calculation_data.set_operation(MathOperation::Multiply);
+
+  calculation_data.add_left_parentheses();
+  calculation_data.set_value("3");
+  calculation_data.set_operation(MathOperation::Multiply);
+  calculation_data.set_value("2");
+  calculation_data.set_operation(MathOperation::Multiply);
+  calculation_data.set_value("2");
+  calculation_data.add_right_parentheses();
+
+  calculation_data.set_operation(MathOperation::Multiply);
+  calculation_data.set_value("1");
+
+  // 2 * (3 * 2 * 2) * 1 == 24
+  assert_eq!(calculation_data.calculate(), "24");
+}
+
+#[test]
+fn should_calculate_sum_with_parentheses() {
+  let mut calculation_data = CalculationData::new();
+
+  calculation_data.set_value("2");
+  calculation_data.set_operation(MathOperation::Plus);
+
+  calculation_data.add_left_parentheses();
+  calculation_data.set_value("3");
+  calculation_data.set_operation(MathOperation::Plus);
+  calculation_data.set_value("2");
+  calculation_data.set_operation(MathOperation::Plus);
+  calculation_data.set_value("2");
+  calculation_data.add_right_parentheses();
+
+  calculation_data.set_operation(MathOperation::Plus);
+  calculation_data.set_value("1");
+
+  // 2 + (3 + 2 + 2) + 1 == 10
+  assert_eq!(calculation_data.calculate(), "10");
 }

@@ -16,14 +16,16 @@ import { apply } from 'services/event-bus';
 import { getEvents } from 'services/event-store';
 
 import {
-  shouldAddMultiplyForConstant,
-  isValueNumber,
-  newValue,
-  canAddSign,
+  isCurrentExponent,
+  isCurrentConstant,
+  isOperationSign,
+  getExponentValue,
+  getValue,
+  shouldRemoveLast,
   canAddOperation,
   canAddRightParentheses,
-  isCurrentNumber,
-  newExponentValue,
+  canAddExponent,
+  canAddPower,
 } from './calculation.state';
 
 import { restore } from 'services/event-bus';
@@ -38,20 +40,26 @@ handle(CommandType.INIT, (): void => {
 });
 
 handle(CommandType.ADD_VALUE, (command: CommandTypeMapping[CommandType.ADD_VALUE]): void => {
-  const exponentValue = newExponentValue(command.value);
-  if (exponentValue !== null) {
+  if (isCurrentExponent()) {
+    const value = getExponentValue(command.value);
+    if (value === null) {
+      return;
+    }
+
     apply({
       type: EventType.EXPONENT_VALUE_CHANGED,
       addedValue: command.value,
-      value: exponentValue,
+      value,
     });
     return;
   }
 
-  if (shouldAddMultiplyForConstant()) {
-    if (!isValueNumber(command.value)) {
-      return;
-    }
+  const value = getValue(command.value);
+  if (value === null) {
+    return;
+  }
+
+  if (isCurrentConstant()) {
     apply({
       type: EventType.MATH_OPERATION_ADDED,
       operation: MathOperation.Multiply,
@@ -59,24 +67,21 @@ handle(CommandType.ADD_VALUE, (command: CommandTypeMapping[CommandType.ADD_VALUE
     apply({
       type: EventType.VALUE_CHANGED,
       addedValue: command.value,
-      value: command.value,
+      value,
     });
     return;
   }
 
-  const resultValue = newValue(command.value);
-  if (!resultValue) {
-    return;
-  }
   apply({
     type: EventType.VALUE_CHANGED,
     addedValue: command.value,
-    value: resultValue,
+    value,
   });
 });
 
 handle(CommandType.ADD_MATH_OPERATION, (command: AddMathOperationCommand): void => {
-  if (canAddSign(command.operation)) {
+  if (isOperationSign(command.operation)) {
+    // ToDo: use constant
     apply({
       type: EventType.VALUE_CHANGED,
       addedValue: '-',
@@ -85,12 +90,19 @@ handle(CommandType.ADD_MATH_OPERATION, (command: AddMathOperationCommand): void 
     return;
   }
 
+  if (shouldRemoveLast()) {
+    removeLastEvent();
+    restore();
+  }
+
   if (canAddOperation()) {
     apply({
       type: EventType.MATH_OPERATION_ADDED,
       operation: command.operation,
     });
   }
+
+  // ToDo: add logic when we add command as first element in expression
 });
 
 handle(CommandType.ADD_LEFT_PARENTHESES, (): void => {
@@ -100,13 +112,11 @@ handle(CommandType.ADD_LEFT_PARENTHESES, (): void => {
 });
 
 handle(CommandType.ADD_RIGHT_PARENTHESES, (): void => {
-  if (!canAddRightParentheses()) {
-    return;
+  if (canAddRightParentheses()) {
+    apply({
+      type: EventType.RIGHT_PARENTHESES_ADDED,
+    });
   }
-
-  apply({
-    type: EventType.RIGHT_PARENTHESES_ADDED,
-  });
 });
 
 handle(CommandType.REMOVE_SYMBOL, (): void => {
@@ -134,7 +144,7 @@ handle(CommandType.ADD_POSTFIX_MODIFIER, (command: AddPostfixModifierCommand): v
 });
 
 handle(CommandType.ADD_MATH_CONSTANT, (command: AddConstantCommand): void => {
-  if (shouldAddMultiplyForConstant()) {
+  if (isCurrentConstant()) {
     apply({
       type: EventType.MATH_OPERATION_ADDED,
       operation: MathOperation.Multiply,
@@ -188,11 +198,17 @@ handle(CommandType.SET_MEASUREMENT, (command: SetMeasurementCommand): void => {
 });
 
 handle(CommandType.ADD_EXPONENT, (): void => {
-  if (!isCurrentNumber()) {
-    return;
+  if (canAddExponent()) {
+    apply({
+      type: EventType.EXPONENT_ADDED,
+    });
   }
+});
 
-  apply({
-    type: EventType.EXPONENT_ADDED,
-  });
+handle(CommandType.ADD_POWER, (): void => {
+  if (canAddPower()) {
+    apply({
+      type: EventType.POWER_ADDED,
+    });
+  }
 });

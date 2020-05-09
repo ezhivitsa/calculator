@@ -55,3 +55,7 @@ export function addExponent(): void {
 export function setExponentPower(power: string): void {
   adapter.setExponent(power);
 }
+
+export function addPower(): void {
+  adapter.addPower();
+}

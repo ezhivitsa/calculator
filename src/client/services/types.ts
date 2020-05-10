@@ -24,6 +24,10 @@ export enum CommandType {
   SET_MEASUREMENT = 'set-measurement',
   ADD_EXPONENT = 'add-exponent',
   ADD_POWER = 'add-power',
+  ADD_POWER_FOR_CONSTANT = 'add-power-for-constant',
+  ADD_POWER_FOR_VALUE = 'add-power-for-values',
+  ADD_VALUE_POWER = 'add-value-power',
+  ADD_ROOT = 'add-root',
 }
 
 export interface BaseCommand {
@@ -59,6 +63,18 @@ export interface SetMeasurementCommand extends BaseCommand {
   measurement: MeasurementType;
 }
 
+export interface AddPowerForConstantCommand extends BaseCommand {
+  constant: MathConstant;
+}
+
+export interface AddPowerForValueCommand extends BaseCommand {
+  value: string;
+}
+
+export interface AddValuePowerCommand extends BaseCommand {
+  value: string;
+}
+
 export type Command =
   | BaseCommand
   | AddValueCommand
@@ -67,7 +83,10 @@ export type Command =
   | AddConstantCommand
   | CalculateResultCommand
   | SetMeasurementCommand
-  | AddPostfixModifierCommand;
+  | AddPostfixModifierCommand
+  | AddPowerForConstantCommand
+  | AddPowerForValueCommand
+  | AddValuePowerCommand;
 
 export type CommandTypeMapping = {
   [CommandType.INIT]: BaseCommand;
@@ -84,6 +103,9 @@ export type CommandTypeMapping = {
   [CommandType.SET_MEASUREMENT]: SetMeasurementCommand;
   [CommandType.ADD_EXPONENT]: BaseCommand;
   [CommandType.ADD_POWER]: BaseCommand;
+  [CommandType.ADD_POWER_FOR_CONSTANT]: AddPowerForConstantCommand;
+  [CommandType.ADD_POWER_FOR_VALUE]: AddPowerForValueCommand;
+  [CommandType.ADD_VALUE_POWER]: AddValuePowerCommand;
 };
 
 // Events

@@ -9,6 +9,9 @@ import {
   CalculateResultCommand,
   SetMeasurementCommand,
   AddPostfixModifierCommand,
+  AddPowerForConstantCommand,
+  AddPowerForValueCommand,
+  AddValuePowerCommand,
 } from 'services/types';
 
 import { handle } from 'services/command-bus';
@@ -27,12 +30,57 @@ import {
   canAddRightParentheses,
   canAddExponent,
   canAddPower,
+  shouldAddMultiplyBeforeValue,
 } from './calculation.state';
 
 import { restore } from 'services/event-bus';
 import { removeLastEvent, removeAllEvents } from 'services/event-store';
 
 import { historyStory } from 'stores/history';
+
+function addMathConstant(constant: MathConstant): void {
+  while (shouldChangeLevel()) {
+    apply({
+      type: EventType.POWER_FINISHED,
+    });
+  }
+
+  if (isCurrentConstant()) {
+    apply({
+      type: EventType.MATH_OPERATION_ADDED,
+      operation: MathOperation.Multiply,
+    });
+  }
+
+  if (constant === MathConstant.RANDOM) {
+    const value = Math.random().toString();
+
+    apply({
+      type: EventType.MATH_CONSTANT_ADDED,
+      constant: MathConstant.RANDOM,
+      value,
+    });
+    return;
+  }
+
+  if (constant === MathConstant.ANSWER) {
+    const value = historyStory.lastNumericResult;
+
+    if (value) {
+      apply({
+        type: EventType.MATH_CONSTANT_ADDED,
+        constant: MathConstant.ANSWER,
+        value,
+      });
+    }
+    return;
+  }
+
+  apply({
+    type: EventType.MATH_CONSTANT_ADDED,
+    constant,
+  });
+}
 
 handle(CommandType.INIT, (): void => {
   apply({
@@ -157,47 +205,7 @@ handle(CommandType.ADD_POSTFIX_MODIFIER, (command: AddPostfixModifierCommand): v
 });
 
 handle(CommandType.ADD_MATH_CONSTANT, (command: AddConstantCommand): void => {
-  while (shouldChangeLevel()) {
-    apply({
-      type: EventType.POWER_FINISHED,
-    });
-  }
-
-  if (isCurrentConstant()) {
-    apply({
-      type: EventType.MATH_OPERATION_ADDED,
-      operation: MathOperation.Multiply,
-    });
-  }
-
-  if (command.constant === MathConstant.RANDOM) {
-    const value = Math.random().toString();
-
-    apply({
-      type: EventType.MATH_CONSTANT_ADDED,
-      constant: MathConstant.RANDOM,
-      value,
-    });
-    return;
-  }
-
-  if (command.constant === MathConstant.ANSWER) {
-    const value = historyStory.lastNumericResult;
-
-    if (value) {
-      apply({
-        type: EventType.MATH_CONSTANT_ADDED,
-        constant: MathConstant.ANSWER,
-        value,
-      });
-    }
-    return;
-  }
-
-  apply({
-    type: EventType.MATH_CONSTANT_ADDED,
-    constant: command.constant,
-  });
+  addMathConstant(command.constant);
 });
 
 handle(CommandType.CALCULATE_RESULT, (command: CalculateResultCommand): void => {
@@ -228,6 +236,52 @@ handle(CommandType.ADD_POWER, (): void => {
   if (canAddPower()) {
     apply({
       type: EventType.POWER_ADDED,
+    });
+  }
+});
+
+handle(CommandType.ADD_POWER_FOR_CONSTANT, (command: AddPowerForConstantCommand): void => {
+  addMathConstant(command.constant);
+  apply({
+    type: EventType.POWER_ADDED,
+  });
+});
+
+handle(CommandType.ADD_POWER_FOR_VALUE, (command: AddPowerForValueCommand): void => {
+  if (shouldAddMultiplyBeforeValue()) {
+    apply({
+      type: EventType.MATH_OPERATION_ADDED,
+      operation: MathOperation.Multiply,
+    });
+  }
+
+  for (let i = 0; i < command.value.length; i += 1) {
+    apply({
+      type: EventType.VALUE_CHANGED,
+      addedValue: command.value[i],
+      value: command.value.slice(0, i + 1),
+    });
+  }
+
+  apply({
+    type: EventType.POWER_ADDED,
+  });
+});
+
+handle(CommandType.ADD_VALUE_POWER, (command: AddValuePowerCommand): void => {
+  if (!canAddPower()) {
+    return;
+  }
+
+  apply({
+    type: EventType.POWER_ADDED,
+  });
+
+  for (let i = 0; i < command.value.length; i += 1) {
+    apply({
+      type: EventType.VALUE_CHANGED,
+      addedValue: command.value[i],
+      value: command.value.slice(0, i + 1),
     });
   }
 });

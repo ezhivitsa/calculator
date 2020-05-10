@@ -112,3 +112,30 @@ export function addPower(): void {
     type: CommandType.ADD_POWER,
   });
 }
+
+export function addPowerForConstant(constant: MathConstant): void {
+  send({
+    type: CommandType.ADD_POWER_FOR_CONSTANT,
+    constant,
+  });
+}
+
+export function addPowerForValue(value: string): void {
+  send({
+    type: CommandType.ADD_POWER_FOR_VALUE,
+    value,
+  });
+}
+
+export function addValuePower(value: string): void {
+  send({
+    type: CommandType.ADD_VALUE_POWER,
+    value,
+  });
+}
+
+export function addRoot(): void {
+  send({
+    type: CommandType.ADD_ROOT,
+  });
+}

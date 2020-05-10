@@ -218,6 +218,15 @@ export function shouldChangeLevel(): boolean {
   return numOpenedParentheses === 0 && level.expression.length > 0;
 }
 
+export function shouldAddMultiplyBeforeValue(): boolean {
+  const item = getLastExpressionItem();
+  return !(
+    item === null ||
+    item === ExpressionItem.PRIORITY_MATH_OPERATION ||
+    item === ExpressionItem.NON_PRIORITY_MATH_OPERATION
+  );
+}
+
 export function canAddOperation(): boolean {
   const item = getLastExpressionItem();
   return item !== ExpressionItem.LEFT_PARENTHESES;

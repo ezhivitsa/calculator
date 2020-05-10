@@ -9,6 +9,10 @@ import {
   addPostfixModifier,
   addExponent,
   addPower,
+  addPowerForConstant,
+  addPowerForValue,
+  addValuePower,
+  addRoot,
 } from 'services/app/calculation.app-service';
 
 import { useCalculatorStore } from 'providers';
@@ -22,7 +26,7 @@ import styles from './scientific-buttons.pcss';
 
 interface Button {
   title: ReactNode;
-  onClick?: () => void;
+  onClick: () => void;
   inverse?: boolean;
 }
 
@@ -58,6 +62,26 @@ export const ScientificButtons = observer(
 
     function handleAddPower(): void {
       addPower();
+    }
+
+    function handleAddPowerForConstant(constant: MathConstant): void {
+      addPowerForConstant(constant);
+      setShowInverse(false);
+    }
+
+    function handleAddPowerForValue(value: string): void {
+      addPowerForValue(value);
+      setShowInverse(false);
+    }
+
+    function handleAddValuePower(value: string): void {
+      addValuePower(value);
+      setShowInverse(false);
+    }
+
+    function handleAddRoot(): void {
+      addRoot();
+      setShowInverse(false);
     }
 
     const buttons: Button[] = [
@@ -97,6 +121,7 @@ export const ScientificButtons = observer(
           </span>
         ),
         inverse: true,
+        onClick: () => handleAddPowerForConstant(MathConstant.E),
       },
       {
         title: buttonTexts.pi,
@@ -130,6 +155,7 @@ export const ScientificButtons = observer(
           </span>
         ),
         inverse: true,
+        onClick: () => handleAddPowerForValue('10'),
       },
       {
         title: buttonTexts.e,
@@ -163,6 +189,7 @@ export const ScientificButtons = observer(
           </span>
         ),
         inverse: true,
+        onClick: () => handleAddValuePower('2'),
       },
       {
         title: buttonTexts.ans,
@@ -199,6 +226,7 @@ export const ScientificButtons = observer(
           </span>
         ),
         inverse: true,
+        onClick: handleAddRoot,
       },
     ];
 

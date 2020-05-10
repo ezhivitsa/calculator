@@ -5,19 +5,9 @@ import { ValueChangedEvent, OperationAddedEvent, EventType, ExponentValueChanged
 
 import { handle } from 'services/event-bus';
 
-const START_VALUE = '0';
 const SIGN = '-';
 
 const PRIORITY_OPERATIONS = [MathOperation.Divide, MathOperation.Multiply];
-
-// interface Current {
-//   value: string;
-//   hasMinusSign: boolean;
-//   action: MathOperation | null;
-//   isValueConstant: boolean;
-//   isExponentValue: boolean;
-//   exponentValue: string;
-// }
 
 enum ExpressionItem {
   VALUE,
@@ -33,24 +23,13 @@ enum ExpressionItem {
 }
 
 interface Level {
-  // current: Current;
   expression: ExpressionItem[];
   currentValue: string;
 }
 
 interface StateData {
   levels: Level[];
-  // hasValues: boolean;
 }
-
-// const initialCurrent: Current = {
-//   value: '',
-//   hasMinusSign: false,
-//   action: null,
-//   isValueConstant: false,
-//   isExponentValue: false,
-//   exponentValue: '',
-// };
 
 const stateData: StateData = {
   levels: [
@@ -150,8 +129,6 @@ handle(EventType.VALUE_CHANGED, ({ value }: ValueChangedEvent): void => {
 });
 
 handle(EventType.MATH_OPERATION_ADDED, ({ operation }: OperationAddedEvent): void => {
-  changeLevelIfRequired();
-
   addToLevel(
     PRIORITY_OPERATIONS.includes(operation)
       ? ExpressionItem.PRIORITY_MATH_OPERATION
@@ -160,16 +137,15 @@ handle(EventType.MATH_OPERATION_ADDED, ({ operation }: OperationAddedEvent): voi
 });
 
 handle(EventType.LEFT_PARENTHESES_ADDED, (): void => {
-  const level = getLastLevel();
-  if (level.expression.length) {
-    changeLevelIfRequired();
-  }
-
   addToLevel(ExpressionItem.LEFT_PARENTHESES);
 });
 
 handle(EventType.RIGHT_PARENTHESES_ADDED, (): void => {
   addToLevel(ExpressionItem.RIGHT_PARENTHESES);
+});
+
+handle(EventType.POWER_FINISHED, (): void => {
+  stateData.levels.pop();
 });
 
 handle(EventType.PREFIX_MODIFIER_ADDED, (): void => {
@@ -232,6 +208,16 @@ export function shouldRemoveLast(): boolean {
   );
 }
 
+export function shouldChangeLevel(): boolean {
+  if (stateData.levels.length === 1) {
+    return false;
+  }
+
+  const level = getLastLevel();
+  const numOpenedParentheses = openedParenthesesOnLevel(level);
+  return numOpenedParentheses === 0 && level.expression.length > 0;
+}
+
 export function canAddOperation(): boolean {
   const item = getLastExpressionItem();
   return item !== ExpressionItem.LEFT_PARENTHESES;
@@ -265,7 +251,13 @@ export function canAddPower(): boolean {
   const level = getLastLevel();
   const item = getLastExpressionItem();
 
-  return isRealNumber(level.currentValue) || item === ExpressionItem.CONSTANT_VALUE;
+  return (
+    isRealNumber(level.currentValue) ||
+    isNaturalNumber(level.currentValue) ||
+    item === ExpressionItem.CONSTANT_VALUE ||
+    item === ExpressionItem.RIGHT_PARENTHESES ||
+    item === ExpressionItem.POSTFIX_MODIFIER
+  );
 }
 
 export function getExponentValue(value: string): string | null {
@@ -289,72 +281,3 @@ export function getValue(value: string): string | null {
 
   return null;
 }
-
-// export function newValue(value: string): string | null {
-//   const level = getLastLevel();
-
-//   const newValue =
-//     !stateData.hasValues && !level.current.value && value === NumberValue.DOT
-//       ? `${START_VALUE}.`
-//       : `${level.current.value}${value}`;
-
-//   if (!isNumber(newValue)) {
-//     return null;
-//   }
-
-//   return newValue;
-// }
-
-// export function canAddSign(operation: MathOperation): boolean {
-//   const level = getLastLevel();
-
-//   if (operation !== MathOperation.Minus || level.current.hasMinusSign) {
-//     return false;
-//   }
-
-//   if (!level.current.value) {
-//     return true;
-//   }
-
-//   return false;
-// }
-
-// export function canAddOperation(): boolean {
-//   const level = getLastLevel();
-
-//   return isNumber(level.current.value) || level.current.isValueConstant;
-// }
-
-// export function canAddRightParentheses(): boolean {
-//   const {
-//     numOpenedParentheses,
-//     current: { action, value },
-//   } = getLastLevel();
-
-//   return numOpenedParentheses > 0 && (action === null || (action !== null && isNumber(value)));
-// }
-
-// export function isCurrentConstant(): boolean {
-//   return getLastLevel().current.isValueConstant;
-// }
-
-// export function isValueNumber(value: string): boolean {
-//   return isNumber(value);
-// }
-
-// export function isCurrentNumber(): boolean {
-//   const { value, action, isValueConstant } = getLastLevel().current;
-
-//   return isNumber(value) && action === null && !isValueConstant;
-// }
-
-// export function newExponentValue(value: string): string | null {
-//   const level = getLastLevel();
-
-//   if (!level.current.isExponentValue) {
-//     return null;
-//   }
-
-//   const newValue = level.current.exponentValue + value;
-//   return isNaturalNumber(newValue) ? newValue : null;
-// }

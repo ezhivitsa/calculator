@@ -1,33 +1,16 @@
 import React, { ReactElement } from 'react';
 import { observer } from 'mobx-react-lite';
-import classnames from 'classnames';
 
 import { usePresentationStore } from 'providers';
 
 import { History } from './components/history';
+import { Expression } from './components/expression';
 
 import styles from './result.pcss';
 
 export const Result = observer(
   (): ReactElement => {
-    const { expression, imaginaryEnd, showResult, result } = usePresentationStore();
-
-    function renderExpression(): ReactElement[] {
-      return expression.map(
-        ({ value, bold }): ReactElement => {
-          return (
-            <span
-              key={value}
-              className={classnames(styles.result__expressionPart, {
-                [styles._bold]: bold,
-              })}
-            >
-              {value}
-            </span>
-          );
-        },
-      );
-    }
+    const { expression, showTemplateForNewLevel, showResult, result } = usePresentationStore();
 
     return (
       <div className={styles.result}>
@@ -35,20 +18,17 @@ export const Result = observer(
 
         {showResult && (
           <div className={styles.result__topExpression}>
-            <span>{renderExpression()}</span>
-            <span>{imaginaryEnd}</span>
+            <Expression expression={expression} />
             <span> =</span>
           </div>
         )}
+
         <div className={styles.result__expression}>
-          {showResult ? (
-            <span>{result}</span>
-          ) : (
-            <>
-              <span className={styles.result__real}>{renderExpression()}</span>
-              <span className={styles.result__imaginary}>{imaginaryEnd}</span>
-            </>
-          )}
+          <Expression
+            expression={showResult ? result : expression}
+            showTemplateForNewLevel={showTemplateForNewLevel}
+            highlightImaginaryPart
+          />
         </div>
       </div>
     );

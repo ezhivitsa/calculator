@@ -102,6 +102,7 @@ export enum EventType {
   EXPONENT_ADDED = 'exponent-added',
   EXPONENT_VALUE_CHANGED = 'exponent-value-changed',
   POWER_ADDED = 'power-added',
+  POWER_FINISHED = 'power-finished',
 }
 
 export interface BaseEvent {
@@ -170,4 +171,5 @@ export type EventTypeMapping = {
   [EventType.EXPONENT_ADDED]: BaseEvent;
   [EventType.EXPONENT_VALUE_CHANGED]: ExponentValueChangedEvent;
   [EventType.POWER_ADDED]: BaseEvent;
+  [EventType.POWER_FINISHED]: BaseEvent;
 };

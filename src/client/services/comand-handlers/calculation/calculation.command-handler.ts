@@ -22,6 +22,7 @@ import {
   getExponentValue,
   getValue,
   shouldRemoveLast,
+  shouldChangeLevel,
   canAddOperation,
   canAddRightParentheses,
   canAddExponent,
@@ -95,6 +96,12 @@ handle(CommandType.ADD_MATH_OPERATION, (command: AddMathOperationCommand): void 
     restore();
   }
 
+  while (shouldChangeLevel()) {
+    apply({
+      type: EventType.POWER_FINISHED,
+    });
+  }
+
   if (canAddOperation()) {
     apply({
       type: EventType.MATH_OPERATION_ADDED,
@@ -112,6 +119,12 @@ handle(CommandType.ADD_LEFT_PARENTHESES, (): void => {
 });
 
 handle(CommandType.ADD_RIGHT_PARENTHESES, (): void => {
+  if (shouldChangeLevel()) {
+    apply({
+      type: EventType.POWER_FINISHED,
+    });
+  }
+
   if (canAddRightParentheses()) {
     apply({
       type: EventType.RIGHT_PARENTHESES_ADDED,
@@ -144,6 +157,12 @@ handle(CommandType.ADD_POSTFIX_MODIFIER, (command: AddPostfixModifierCommand): v
 });
 
 handle(CommandType.ADD_MATH_CONSTANT, (command: AddConstantCommand): void => {
+  while (shouldChangeLevel()) {
+    apply({
+      type: EventType.POWER_FINISHED,
+    });
+  }
+
   if (isCurrentConstant()) {
     apply({
       type: EventType.MATH_OPERATION_ADDED,

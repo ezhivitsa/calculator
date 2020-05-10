@@ -54,10 +54,12 @@ const constantRepresentation: {
   [MathConstant.PI]: {
     value: 'π',
     bold: true,
+    level: 0,
   },
   [MathConstant.E]: {
     value: 'e',
     bold: true,
+    level: 0,
   },
   [MathConstant.ANSWER]: 'Ans',
   [MathConstant.RANDOM]: 'Rnd',
@@ -68,8 +70,8 @@ const ERROR = 'Error';
 
 export class PresentationStore {
   @observable private _expression: ExpressionValue[] = [];
-  @observable private _notClosedParentheses = 0;
   @observable private _result = '';
+  @observable private _currentLevel = 0;
 
   constructor() {
     this._initHandlers();
@@ -87,6 +89,8 @@ export class PresentationStore {
     handle(EventType.POSTFIX_MODIFIER_ADDED, this._handlePostfixModifierAdded);
     handle(EventType.EXPONENT_ADDED, this._handleExponentAdded);
     handle(EventType.EXPONENT_VALUE_CHANGED, this._handleExponentValueChanged);
+    handle(EventType.POWER_ADDED, this._handlePowerAdded);
+    handle(EventType.POWER_FINISHED, this._handlePowerFinished);
   }
 
   @computed
@@ -96,17 +100,19 @@ export class PresentationStore {
 
   @computed
   get expression(): ExpressionValue[] {
-    return this._expression.length ? this._expression : [{ value: START_VALUE, bold: false }];
-  }
-
-  @computed
-  get imaginaryEnd(): string {
-    return ''.padEnd(this._notClosedParentheses, ')');
+    return this._expression.length ? this._expression : [{ value: START_VALUE, bold: false, level: 0 }];
   }
 
   @computed
   get result(): string {
     return this._result;
+  }
+
+  @computed
+  get showTemplateForNewLevel(): boolean {
+    const expression = this.expression;
+    const lastValue = expression[expression.length - 1];
+    return lastValue.level + 1 === this._currentLevel;
   }
 
   private _addToExpression(value: RepresentationValue): void {
@@ -115,8 +121,11 @@ export class PresentationStore {
         ? {
             value,
             bold: false,
+            level: this._currentLevel,
           }
-        : value;
+        : { ...value };
+
+    valueToAdd.level = this._currentLevel;
 
     if (!this._expression.length) {
       this._expression.push(valueToAdd);
@@ -124,7 +133,7 @@ export class PresentationStore {
     }
 
     const lastValue = this._expression[this._expression.length - 1];
-    if (lastValue.bold === valueToAdd.bold) {
+    if (lastValue.bold === valueToAdd.bold && lastValue.level === valueToAdd.level) {
       lastValue.value += valueToAdd.value;
     } else {
       this._expression.push(valueToAdd);
@@ -148,19 +157,16 @@ export class PresentationStore {
   @action
   private _handleLeftParenthesesAdded = (): void => {
     this._addToExpression('(');
-    this._notClosedParentheses += 1;
   };
 
   @action
   private _handleRightParenthesesAdded = (): void => {
     this._addToExpression(')');
-    this._notClosedParentheses -= 1;
   };
 
   @action
   private _handleModifierAdded = ({ modifier }: PrefixModifierAddedEvent): void => {
     this._addToExpression(` ${prefixModifierRepresentation[modifier]}`);
-    this._notClosedParentheses += 1;
   };
 
   @action
@@ -180,8 +186,8 @@ export class PresentationStore {
   @action
   private _handleInitialized = (): void => {
     this._expression = [];
-    this._notClosedParentheses = 0;
     this._result = '';
+    this._currentLevel = 0;
   };
 
   @action
@@ -197,5 +203,15 @@ export class PresentationStore {
   @action
   private _handleExponentValueChanged = ({ addedValue }: ExponentValueChangedEvent): void => {
     this._addToExpression(addedValue);
+  };
+
+  @action
+  private _handlePowerAdded = (): void => {
+    this._currentLevel += 1;
+  };
+
+  @action
+  private _handlePowerFinished = (): void => {
+    this._currentLevel -= 1;
   };
 }

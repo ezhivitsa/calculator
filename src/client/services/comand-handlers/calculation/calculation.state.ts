@@ -76,18 +76,6 @@ function openedParenthesesOnLevel(level: Level): number {
   }, 0);
 }
 
-function changeLevelIfRequired(): void {
-  if (stateData.levels.length === 1) {
-    return;
-  }
-
-  const level = getLastLevel();
-  const numOpenedParentheses = openedParenthesesOnLevel(level);
-  if (numOpenedParentheses === 0) {
-    stateData.levels.pop();
-  }
-}
-
 function addToLevel(item: ExpressionItem): void {
   const level = getLastLevel();
   level.expression.push(item);
@@ -172,6 +160,10 @@ handle(EventType.EXPONENT_VALUE_CHANGED, ({ value }: ExponentValueChangedEvent):
 });
 
 handle(EventType.POWER_ADDED, (): void => {
+  addLevel();
+});
+
+handle(EventType.ROOT_ADDED, (): void => {
   addLevel();
 });
 

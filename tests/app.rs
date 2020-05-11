@@ -204,3 +204,18 @@ fn should_calculate_sum_with_parentheses() {
   // 2 + (3 + 2 + 2) + 1 == 10
   assert_eq!(calculation_data.calculate(), "10");
 }
+
+#[test]
+fn should_calculate_root() {
+  let mut calculation_data = CalculationData::new();
+
+  calculation_data.set_value("2");
+  calculation_data.set_operation(MathOperation::Multiply);
+
+  calculation_data.set_value("16");
+  calculation_data.add_root();
+  calculation_data.set_value("4");
+
+  // 2 + 4√16 == 4
+  assert_eq!(calculation_data.calculate(), "4");
+}

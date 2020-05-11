@@ -197,13 +197,13 @@ impl CalculationData {
     self.measurement = measurement;
   }
 
-  fn add_power_node(&mut self) -> Rc<RefCell<Node>> {
+  fn add_power_node(&mut self, value: Value) -> Rc<RefCell<Node>> {
     let mut expression = self.expression.borrow_mut();
   
     let left = expression.clone();
     let right = Rc::new(RefCell::new(Node::new()));
   
-    expression.set_value(Value::Power);
+    expression.set_value(value);
     expression.set_left(Rc::new(RefCell::new(left)));
     expression.set_right(right.clone());
 
@@ -211,7 +211,12 @@ impl CalculationData {
   }
 
   pub fn add_power(&mut self) {
-    let right = self.add_power_node();
+    let right = self.add_power_node(Value::Power);
+    self.expression = right;
+  }
+
+  pub fn add_root(&mut self) {
+    let right = self.add_power_node(Value::Root);
     self.expression = right;
   }
 
@@ -225,7 +230,7 @@ impl CalculationData {
   pub fn add_exp(&mut self) {
     self.set_operation(MathOperation::Multiply);
     self.set_value("10");
-    self.add_power_node();
+    self.add_power_node(Value::Power);
     self.set_power("0");
   }
 }

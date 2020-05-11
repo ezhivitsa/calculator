@@ -18,7 +18,8 @@ pub enum Value {
   Operation(MathOperation),
   PrefixModifier(PrefixModifier),
   PostfixModifier(PostfixModifier),
-  Power
+  Power,
+  Root
 }
 
 pub struct Node {
@@ -136,6 +137,19 @@ impl Node {
         power::apply_power(left_value, right_value)
       },
 
+      Value::Root => {
+        let left_value = self.get_left_value(
+          measurement,
+          "Error when get left value for root"
+        );
+        let right_value = self.get_right_value(
+          measurement,
+          "Error when get right value for root"
+        );
+        
+        power::apply_root(left_value, right_value)
+      },
+
       Value::None => {
         match &self.left {
           Some(node) => {
@@ -177,7 +191,7 @@ impl Node {
         true
       },
 
-      Value::Operation(_) | Value::Power => {
+      Value::Operation(_) | Value::Power | Value::Root => {
         let left_valid = self.validate_left();
         let right_valid = self.validate_right();
 
@@ -205,7 +219,8 @@ impl Node {
       Value::Operation(operation) => Value::Operation(math_operation::copy_operation(operation)),
       Value::PrefixModifier(modifier) => Value::PrefixModifier(prefix_modifier::copy_modifier(modifier)),
       Value::PostfixModifier(modifier) => Value::PostfixModifier(postfix_modifier::copy_modifier(modifier)),
-      Value::Power => Value::Power
+      Value::Power => Value::Power,
+      Value::Root => Value::Root
     }
   }
 
@@ -232,7 +247,8 @@ impl Node {
       Value::Float(_) |
       Value::PrefixModifier(_) |
       Value::PostfixModifier(_) |
-      Value::Power => false,
+      Value::Power |
+      Value::Root => false,
       Value::None | Value::Operation(_) => true
     }
   }

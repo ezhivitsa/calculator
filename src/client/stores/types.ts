@@ -77,4 +77,5 @@ export interface ExpressionValue {
   value: string;
   bold: boolean;
   level: number;
+  insertBefore?: boolean;
 }

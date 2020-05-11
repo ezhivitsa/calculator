@@ -35,15 +35,25 @@ export const Expression = observer(
       );
     }
 
+    function renderNextLevel(expression: ExpressionValue[], level: number, index: number): ReactElement {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      return <sup key={`sup-${level}-${index}`}>{renderExpression(expression, level, index)}</sup>;
+    }
+
     function renderExpression(expression: ExpressionValue[], renderLevel = 0, index = 0): ReactElement[] {
       const result: ReactElement[] = [];
       let openedParenthesis = 0;
 
       for (let i = index; i < expression.length; i += 1) {
-        const { value, bold, level } = expression[i];
+        const { value, bold, level, insertBefore } = expression[i];
 
         if (level === renderLevel) {
           openedParenthesis += countParenthesis(value);
+
+          if (insertBefore && showTemplateForNewLevel) {
+            showTemplateForNewLevel = false;
+            result.push(renderPowerTemplate());
+          }
 
           result.push(
             <span
@@ -55,8 +65,8 @@ export const Expression = observer(
               {value}
             </span>,
           );
-        } else if (level === renderLevel + 1) {
-          result.push(<sup key={`sup-${level}-${i}`}>{renderExpression(expression, level, i)}</sup>);
+        } else if (level >= renderLevel + 1) {
+          result.push(renderNextLevel(expression, renderLevel + 1, i));
 
           while (i + 1 < expression.length && expression[i + 1].level !== renderLevel) {
             i += 1;

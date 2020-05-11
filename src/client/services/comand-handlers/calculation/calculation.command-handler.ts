@@ -285,3 +285,11 @@ handle(CommandType.ADD_VALUE_POWER, (command: AddValuePowerCommand): void => {
     });
   }
 });
+
+handle(CommandType.ADD_ROOT, (): void => {
+  if (canAddPower()) {
+    apply({
+      type: EventType.ROOT_ADDED,
+    });
+  }
+});

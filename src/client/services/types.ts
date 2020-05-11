@@ -125,6 +125,7 @@ export enum EventType {
   EXPONENT_VALUE_CHANGED = 'exponent-value-changed',
   POWER_ADDED = 'power-added',
   POWER_FINISHED = 'power-finished',
+  ROOT_ADDED = 'root-added',
 }
 
 export interface BaseEvent {

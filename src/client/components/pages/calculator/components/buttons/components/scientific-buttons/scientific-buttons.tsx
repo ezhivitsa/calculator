@@ -125,7 +125,7 @@ export const ScientificButtons = observer(
       },
       {
         title: buttonTexts.pi,
-        onClick: () => handleConstantClick(MathConstant.PI),
+        onClick: () => handleConstantClick(MathConstant.Pi),
       },
       {
         title: buttonTexts.cosine,
@@ -194,12 +194,12 @@ export const ScientificButtons = observer(
       {
         title: buttonTexts.ans,
         inverse: false,
-        onClick: () => handleConstantClick(MathConstant.ANSWER),
+        onClick: () => handleConstantClick(MathConstant.Answer),
       },
       {
         title: buttonTexts.rnd,
         inverse: true,
-        onClick: () => handleConstantClick(MathConstant.RANDOM),
+        onClick: () => handleConstantClick(MathConstant.Random),
       },
       {
         title: buttonTexts.exp,

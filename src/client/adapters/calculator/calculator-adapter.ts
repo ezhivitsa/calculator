@@ -145,4 +145,10 @@ export class CalculatorAdapter {
       return instance.add_power();
     });
   }
+
+  addRoot(): void | Promise<void> {
+    return this._waitInitInstance((instance: CalculationData) => {
+      return instance.add_root();
+    });
+  }
 }

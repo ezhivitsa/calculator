@@ -219,3 +219,31 @@ fn should_calculate_root() {
   // 2 + 4√16 == 4
   assert_eq!(calculation_data.calculate(), "4");
 }
+
+#[test]
+fn should_calculate_expression_with_difficult_root() {
+  let mut calculation_data = CalculationData::new();
+
+  calculation_data.add_left_parentheses();
+  calculation_data.set_value("14");
+  calculation_data.set_operation(MathOperation::Plus);
+  calculation_data.set_value("2");
+  calculation_data.add_right_parentheses();
+
+  calculation_data.add_root();
+  calculation_data.add_left_parentheses();
+  calculation_data.set_value("5");
+  calculation_data.set_operation(MathOperation::Plus);
+  calculation_data.set_value("3");
+  calculation_data.add_right_parentheses();
+
+  calculation_data.add_root();
+  calculation_data.add_left_parentheses();
+  calculation_data.set_value("9");
+  calculation_data.set_operation(MathOperation::Minus);
+  calculation_data.set_value("6");
+  calculation_data.add_right_parentheses();
+
+  // (9 - 6)√(5 + 3)√(14 + 2) == 4
+  assert_eq!(calculation_data.calculate(), "4");
+}

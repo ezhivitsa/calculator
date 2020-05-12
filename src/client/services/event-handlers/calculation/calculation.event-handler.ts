@@ -24,6 +24,7 @@ import {
   addExponent,
   setExponentPower,
   addPower,
+  addRoot,
 } from './calculation.store';
 
 handle(EventType.INITIALIZED, (): void => {
@@ -72,4 +73,8 @@ handle(EventType.EXPONENT_VALUE_CHANGED, ({ value }: ExponentValueChangedEvent):
 
 handle(EventType.POWER_ADDED, (): void => {
   addPower();
+});
+
+handle(EventType.ROOT_ADDED, (): void => {
+  addRoot();
 });

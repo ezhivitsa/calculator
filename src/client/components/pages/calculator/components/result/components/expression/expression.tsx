@@ -1,10 +1,12 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, Fragment } from 'react';
 import { observer } from 'mobx-react-lite';
 import classnames from 'classnames';
 
 import { ExpressionValue } from 'stores/types';
 
 import { countParenthesis } from 'lib/strings';
+
+import { expressionTexts } from 'texts';
 
 import styles from './expression.pcss';
 
@@ -22,7 +24,7 @@ export const Expression = observer(
     function renderImaginaryPart(openedParenthesis: number): ReactElement {
       return (
         <span key="imaginary-part" className={highlightImaginaryPart ? styles.expression__imaginary : undefined}>
-          {''.padEnd(openedParenthesis, ')')}
+          {''.padEnd(openedParenthesis, expressionTexts.rightParentheses)}
         </span>
       );
     }
@@ -40,6 +42,27 @@ export const Expression = observer(
       return <sup key={`sup-${level}-${index}`}>{renderExpression(expression, level, index)}</sup>;
     }
 
+    function renderExpressionPart(value: string, bold: boolean, key: number, insertBefore?: boolean): ReactElement {
+      const shouldRenderPowerTemplate = insertBefore && showTemplateForNewLevel;
+
+      if (shouldRenderPowerTemplate) {
+        showTemplateForNewLevel = false;
+      }
+
+      return (
+        <Fragment key={key}>
+          {shouldRenderPowerTemplate && renderPowerTemplate()}
+          <span
+            className={classnames(styles.expression__part, {
+              [styles._bold]: bold,
+            })}
+          >
+            {value}
+          </span>
+        </Fragment>
+      );
+    }
+
     function renderExpression(expression: ExpressionValue[], renderLevel = 0, index = 0): ReactElement[] {
       const result: ReactElement[] = [];
       let openedParenthesis = 0;
@@ -49,22 +72,7 @@ export const Expression = observer(
 
         if (level === renderLevel) {
           openedParenthesis += countParenthesis(value);
-
-          if (insertBefore && showTemplateForNewLevel) {
-            showTemplateForNewLevel = false;
-            result.push(renderPowerTemplate());
-          }
-
-          result.push(
-            <span
-              key={i}
-              className={classnames(styles.expression__part, {
-                [styles._bold]: bold,
-              })}
-            >
-              {value}
-            </span>,
-          );
+          result.push(renderExpressionPart(value, bold, i, insertBefore));
         } else if (level >= renderLevel + 1) {
           result.push(renderNextLevel(expression, renderLevel + 1, i));
 

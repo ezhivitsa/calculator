@@ -4,12 +4,12 @@ import classnames from 'classnames';
 
 import { Button } from 'components/global/button';
 
-import { MathOperation, CleanAction } from 'stores';
+import { MathOperation } from 'stores';
 import { addAction, cleanAll, clean } from 'services/app/calculation.app-service';
 import { usePresentationStore } from 'providers';
 
 import { LONG_PRESS_TIMEOUT } from 'constants/app';
-import { operationTexts } from 'texts';
+import { operationTexts, cleanButtonTexts } from 'texts';
 
 import styles from './math-buttons.pcss';
 
@@ -59,7 +59,7 @@ export const MathButtons = observer(
     }
 
     function renderCleanButton(): ReactNode {
-      const text = presentationStore.showResult ? CleanAction.CLEAN_RESULT : CleanAction.CLEAN_ONE;
+      const text = presentationStore.showResult ? cleanButtonTexts.cleanResult : cleanButtonTexts.cleanOne;
       return (
         <Button
           className={classnames(styles.mathButtons__btn, styles._clean)}

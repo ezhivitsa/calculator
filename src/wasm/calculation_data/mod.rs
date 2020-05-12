@@ -16,7 +16,8 @@ use wasm_bindgen::prelude::*;
 static MATH_CONSTANTS_MAP: phf::Map<&'static str, f64> = phf_map! {
   "pi" => PI,
   "e" => E,
-  "." => 0.0
+  "." => 0.0,
+  "-" => 0.0
 };
 
 fn parse_float(value: &str) -> f64 {

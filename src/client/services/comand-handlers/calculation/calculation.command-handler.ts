@@ -5,7 +5,7 @@ import {
   AddConstantCommand,
   EventType,
   CommandType,
-  CommandTypeMapping,
+  AddValueCommand,
   CalculateResultCommand,
   SetMeasurementCommand,
   AddPostfixModifierCommand,
@@ -52,24 +52,24 @@ function addMathConstant(constant: MathConstant): void {
     });
   }
 
-  if (constant === MathConstant.RANDOM) {
+  if (constant === MathConstant.Random) {
     const value = Math.random().toString();
 
     apply({
       type: EventType.MATH_CONSTANT_ADDED,
-      constant: MathConstant.RANDOM,
+      constant: MathConstant.Random,
       value,
     });
     return;
   }
 
-  if (constant === MathConstant.ANSWER) {
+  if (constant === MathConstant.Answer) {
     const value = historyStory.lastNumericResult;
 
     if (value) {
       apply({
         type: EventType.MATH_CONSTANT_ADDED,
-        constant: MathConstant.ANSWER,
+        constant: MathConstant.Answer,
         value,
       });
     }
@@ -88,7 +88,7 @@ handle(CommandType.INIT, (): void => {
   });
 });
 
-handle(CommandType.ADD_VALUE, (command: CommandTypeMapping[CommandType.ADD_VALUE]): void => {
+handle(CommandType.ADD_VALUE, (command: AddValueCommand): void => {
   if (isCurrentExponent()) {
     const value = getExponentValue(command.value);
     if (value === null) {

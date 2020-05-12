@@ -5,7 +5,7 @@ import { Button } from 'components/global/button';
 import { Parentheses, PostfixModifier } from 'stores';
 import { addParentheses, addPostfixModifier } from 'services/app/calculation.app-service';
 
-import { buttonTexts } from 'texts';
+import { buttonTexts, expressionTexts } from 'texts';
 
 import styles from './extra-math-buttons.pcss';
 
@@ -20,12 +20,12 @@ export function ExtraMathButtons(): ReactElement {
 
   const buttons = [
     {
-      title: Parentheses.LEFT,
-      onClick: () => handleParenthesesClick(Parentheses.LEFT),
+      title: expressionTexts.leftParentheses,
+      onClick: () => handleParenthesesClick(Parentheses.Left),
     },
     {
-      title: Parentheses.RIGHT,
-      onClick: () => handleParenthesesClick(Parentheses.RIGHT),
+      title: expressionTexts.rightParentheses,
+      onClick: () => handleParenthesesClick(Parentheses.Right),
     },
     {
       title: buttonTexts.percent,

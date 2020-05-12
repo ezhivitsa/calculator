@@ -3,7 +3,6 @@ import { send } from 'services/command-bus';
 import {
   MathOperation,
   Parentheses,
-  NumberValue,
   MathConstant,
   PrefixModifier,
   ExpressionValue,
@@ -20,7 +19,7 @@ export function init(): void {
   });
 }
 
-export function setNumber(value: NumberValue): void {
+export function setNumber(value: string): void {
   send({
     type: CommandType.ADD_VALUE,
     value,
@@ -69,7 +68,7 @@ export function clean(): void {
 
 export function addParentheses(parentheses: Parentheses): void {
   const command: Command =
-    parentheses === Parentheses.LEFT
+    parentheses === Parentheses.Left
       ? {
           type: CommandType.ADD_LEFT_PARENTHESES,
         }

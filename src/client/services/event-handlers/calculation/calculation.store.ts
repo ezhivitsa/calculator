@@ -59,3 +59,7 @@ export function setExponentPower(power: string): void {
 export function addPower(): void {
   adapter.addPower();
 }
+
+export function addRoot(): void {
+  adapter.addRoot();
+}

@@ -4,7 +4,7 @@ import { handle } from 'services/event-bus';
 
 import { countParenthesis } from 'lib/strings';
 
-import { operationTexts, expressionTexts } from 'texts';
+import { operationTexts, expressionTexts, buttonTexts } from 'texts';
 
 import {
   ValueChangedEvent,
@@ -53,16 +53,16 @@ const postfixModifierRepresentation: {
 const constantRepresentation: {
   readonly [key in MathConstant]: RepresentationValue;
 } = {
-  [MathConstant.PI]: {
-    value: 'π',
+  [MathConstant.Pi]: {
+    value: buttonTexts.pi,
     bold: true,
   },
   [MathConstant.E]: {
-    value: 'e',
+    value: buttonTexts.e,
     bold: true,
   },
-  [MathConstant.ANSWER]: 'Ans',
-  [MathConstant.RANDOM]: 'Rnd',
+  [MathConstant.Answer]: buttonTexts.ans,
+  [MathConstant.Random]: buttonTexts.rnd,
 };
 
 const START_VALUE = '0';
@@ -154,6 +154,23 @@ export class PresentationStore {
     return result;
   }
 
+  private _combineExpressions(expressions: ExpressionValue[]): ExpressionValue[] {
+    const result: ExpressionValue[] = [];
+
+    for (let i = 0; i < expressions.length; i += 1) {
+      const lastExp = result[result.length - 1];
+      const { value, bold, level } = expressions[i];
+
+      if (lastExp && lastExp.bold === bold && lastExp.level === level) {
+        lastExp.value += value;
+      } else {
+        result.push({ ...expressions[i] });
+      }
+    }
+
+    return result;
+  }
+
   @computed
   get showResult(): boolean {
     return Boolean(this._result);
@@ -163,7 +180,7 @@ export class PresentationStore {
   get expression(): ExpressionValue[] {
     const result = this._expression.length ? [...this._expression] : [{ value: START_VALUE, bold: false, level: 0 }];
 
-    return this._updatePositions(result);
+    return this._combineExpressions(this._updatePositions(result));
   }
 
   @computed
@@ -198,18 +215,7 @@ export class PresentationStore {
       return;
     }
 
-    // const lastValue = this._expression[this._expression.length - 1];
-    // if (lastValue.bold === valueToAdd.bold && lastValue.level === valueToAdd.level) {
-    //   lastValue.value += valueToAdd.value;
-    // } else {
-
-    // if (this._positionToInsert === null) {
     this._expression.push(valueToAdd);
-    // } else {
-    //   this._expression.splice(this._positionToInsert, 0, valueToAdd);
-    //   this._positionToInsert += 1;
-    // }
-    // }
   }
 
   @action
@@ -228,12 +234,12 @@ export class PresentationStore {
 
   @action
   private _handleLeftParenthesesAdded = (): void => {
-    this._addToExpression('(');
+    this._addToExpression(expressionTexts.leftParentheses);
   };
 
   @action
   private _handleRightParenthesesAdded = (): void => {
-    this._addToExpression(')');
+    this._addToExpression(expressionTexts.rightParentheses);
   };
 
   @action
@@ -243,7 +249,7 @@ export class PresentationStore {
 
   @action
   private _handleMathConstantAdded = ({ value, constant }: MathConstantAddedEvent): void => {
-    if (constant === MathConstant.RANDOM && value) {
+    if (constant === MathConstant.Random && value) {
       this._addToExpression(value);
     } else {
       this._addToExpression(constantRepresentation[constant]);

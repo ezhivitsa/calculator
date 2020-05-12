@@ -5,21 +5,6 @@ export enum MathOperation {
   Plus,
 }
 
-export enum MathModifier {
-  PERCENT = '%',
-  FACTORIAL = 'factorial',
-  SIN = 'sin',
-  ASIN = 'asin',
-  LN = 'ln',
-  COS = 'cos',
-  ACOS = 'acos',
-  LOG = 'log',
-  TAN = 'tan',
-  ATAN = 'atan',
-  SQUARE_ROOT = 'square-root',
-  EXP = 'exp',
-}
-
 export enum PostfixModifier {
   Factorial,
   Percent,
@@ -43,34 +28,29 @@ export enum MeasurementType {
 }
 
 export enum NumberValue {
-  ZERO = '0',
-  ONE = '1',
-  TWO = '2',
-  THREE = '3',
-  FOUR = '4',
-  FIVE = '5',
-  SIX = '6',
-  SEVEN = '7',
-  EIGHT = '8',
-  NINE = '9',
-  DOT = '.',
+  Zero = '0',
+  One = '1',
+  Two = '2',
+  Three = '3',
+  Four = '4',
+  Five = '5',
+  Six = '6',
+  Seven = '7',
+  Eight = '8',
+  Nine = '9',
+  Dot = '.',
 }
 
 export enum Parentheses {
-  LEFT = '(',
-  RIGHT = ')',
-}
-
-export enum CleanAction {
-  CLEAN_ONE = 'CE',
-  CLEAN_RESULT = 'AC',
+  Left,
+  Right,
 }
 
 export enum MathConstant {
-  PI = 'pi',
+  Pi = 'pi',
   E = 'e',
-  ANSWER = 'Ans',
-  RANDOM = 'Rnd',
+  Answer = 'Ans',
+  Random = 'Rnd',
 }
 
 export interface ExpressionValue {

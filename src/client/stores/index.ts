@@ -1,6 +1,5 @@
 export {
   MathOperation,
-  CleanAction,
   NumberValue,
   Parentheses,
   PrefixModifier,

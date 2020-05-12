@@ -184,7 +184,7 @@ export function isOperationSign(operation: MathOperation): boolean {
 
   const item = getLastExpressionItem();
   return (
-    !item ||
+    item === null ||
     item === ExpressionItem.PRIORITY_MATH_OPERATION ||
     item === ExpressionItem.LEFT_PARENTHESES ||
     item === ExpressionItem.EXPONENT

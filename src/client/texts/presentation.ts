@@ -9,6 +9,7 @@ export const expressionTexts = {
   atan: 'arctan',
   squareRoot: '√',
   leftParentheses: '(',
+  rightParentheses: ')',
   factorial: '!',
   percent: '%',
   exponent: 'E',

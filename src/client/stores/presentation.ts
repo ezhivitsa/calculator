@@ -120,10 +120,17 @@ export class PresentationStore {
 
     for (let i = end - 1; i >= 0; i -= 1) {
       const expression = expressions[i];
+      const prevExpression = expressions[Math.max(i - 1, 0)];
+
       parentheses += countParenthesis(expression.value);
 
       if (parentheses === 0 && operations.includes(expression.value.trim())) {
         pos = i + 1;
+        break;
+      }
+
+      if (parentheses === 0 && prevExpression.level !== expression.level) {
+        pos = i;
         break;
       }
     }

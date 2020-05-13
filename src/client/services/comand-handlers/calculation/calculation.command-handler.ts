@@ -36,9 +36,7 @@ import {
 import { restore } from 'services/event-bus';
 import { removeLastEvent, removeAllEvents } from 'services/event-store';
 
-import { historyStory } from 'stores/history';
-
-function addMathConstant(constant: MathConstant): void {
+function addMathConstant(constant: MathConstant, constantValue: string | null = null): void {
   while (shouldChangeLevel()) {
     apply({
       type: EventType.POWER_FINISHED,
@@ -64,7 +62,7 @@ function addMathConstant(constant: MathConstant): void {
   }
 
   if (constant === MathConstant.Answer) {
-    const value = historyStory.lastNumericResult;
+    const value = constantValue;
 
     if (value) {
       apply({
@@ -205,7 +203,7 @@ handle(CommandType.ADD_POSTFIX_MODIFIER, (command: AddPostfixModifierCommand): v
 });
 
 handle(CommandType.ADD_MATH_CONSTANT, (command: AddConstantCommand): void => {
-  addMathConstant(command.constant);
+  addMathConstant(command.constant, command.value);
 });
 
 handle(CommandType.CALCULATE_RESULT, (command: CalculateResultCommand): void => {

@@ -1,9 +1,11 @@
+import { observable, action, computed } from 'mobx';
+
 import { handle } from 'services/event-bus';
 
 import { Event, ResultCalculatedEvent, EventType } from 'services/types';
 import { ExpressionValue } from './types';
 
-class CalculationHistory {
+export class CalculationHistory {
   private _expression: ExpressionValue[];
   private _result: string | null;
   private _events: Event[];
@@ -32,12 +34,18 @@ class CalculationHistory {
 }
 
 export class HistoryStore {
-  private _history: CalculationHistory[] = [];
+  @observable private _history: CalculationHistory[] = [];
 
   constructor() {
     this._initHandlers();
   }
 
+  @computed
+  get historyItems(): CalculationHistory[] {
+    return this._history;
+  }
+
+  @computed
   get lastNumericResult(): string | null {
     for (let i = this._history.length - 1; i >= 0; i -= 1) {
       const historyItem = this._history[i];
@@ -53,9 +61,8 @@ export class HistoryStore {
     handle(EventType.RESULT_CALCULATED, this._handleResultCalculated);
   }
 
+  @action
   private _handleResultCalculated = ({ expression, result, events }: ResultCalculatedEvent): void => {
     this._history.push(new CalculationHistory(expression, result, events));
   };
 }
-
-export const historyStory = new HistoryStore();

@@ -6,17 +6,45 @@
   &__btn {
     border: 0;
     background: transparent;
-    color: var(--color-grey-600);
+    color: var(--color-grey-800);
     cursor: pointer;
+    position: relative;
+    z-index: 2;
+    padding: 0;
+    font-size: var(--font-size-600);
 
     &:hover {
       color: var(--color-grey-700);
+    }
+
+    &._history-visible {
+      color: var(--color-blue-700);
+
+      &:hover,
+      &:focus {
+        color: var(--color-blue-800);
+      }
     }
   }
 
   &__items {
     position: absolute;
+    z-index: 1;
     width: 450px;
     height: auto;
+    background: var(--color-white);
+    box-shadow: 0 1px 4px rgba(0,0,0,.28);
+    top: calc(var(--grid4) * -1);
+    left: calc(var(--grid4) * -1);
+    padding: var(--grid9) var(--grid4) var(--grid4);
+    box-sizing: border-box;
+    border-radius: var(--border-radius-300);
+  }
+
+  &__placeholder {
+    text-align: center;
+    line-height: var(--font-size-700);
+    color: var(--color-grey-500);
+    padding: var(--grid2) var(--grid4) var(--grid4);
   }
 }

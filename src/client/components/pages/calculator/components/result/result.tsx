@@ -3,8 +3,9 @@ import { observer } from 'mobx-react-lite';
 
 import { usePresentationStore } from 'providers';
 
+import { Expression } from 'components/global/expression';
+
 import { History } from './components/history';
-import { Expression } from './components/expression';
 
 import styles from './result.pcss';
 

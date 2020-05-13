@@ -14,3 +14,7 @@ export const expressionTexts = {
   percent: '%',
   exponent: 'E',
 };
+
+export const historyTexts = {
+  noItems: 'Your calculations and results appear here so that you can reuse them',
+};

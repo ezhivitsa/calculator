@@ -47,10 +47,11 @@ export function addPostfixModifier(modifier: PostfixModifier): void {
   });
 }
 
-export function addConstant(constant: MathConstant): void {
+export function addConstant(constant: MathConstant, value: string | null): void {
   send({
     type: CommandType.ADD_MATH_CONSTANT,
     constant,
+    value,
   });
 }
 

@@ -52,6 +52,7 @@ export interface AddPostfixModifierCommand extends BaseCommand {
 
 export interface AddConstantCommand extends BaseCommand {
   constant: MathConstant;
+  value: string | null;
 }
 
 export interface CalculateResultCommand extends BaseCommand {

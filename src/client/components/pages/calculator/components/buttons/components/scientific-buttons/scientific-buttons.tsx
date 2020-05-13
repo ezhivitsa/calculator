@@ -15,7 +15,7 @@ import {
   addRoot,
 } from 'services/app/calculation.app-service';
 
-import { useCalculatorStore } from 'providers';
+import { useCalculatorStore, useHistoryStore } from 'providers';
 
 import { buttonTexts, measurementTypeTexts } from 'texts/buttons';
 
@@ -33,15 +33,17 @@ interface Button {
 export const ScientificButtons = observer(
   (): ReactElement => {
     const [showInverse, setShowInverse] = useState(false);
+
     const calculator = useCalculatorStore();
+    const history = useHistoryStore();
 
     function handleModifierClick(modifier: PrefixModifier): void {
       addPrefixModifier(modifier);
       setShowInverse(false);
     }
 
-    function handleConstantClick(constant: MathConstant): void {
-      addConstant(constant);
+    function handleConstantClick(constant: MathConstant, value: string | null = null): void {
+      addConstant(constant, value);
     }
 
     function handleInverseClick(): void {
@@ -194,7 +196,7 @@ export const ScientificButtons = observer(
       {
         title: buttonTexts.ans,
         inverse: false,
-        onClick: () => handleConstantClick(MathConstant.Answer),
+        onClick: () => handleConstantClick(MathConstant.Answer, history.lastNumericResult),
       },
       {
         title: buttonTexts.rnd,

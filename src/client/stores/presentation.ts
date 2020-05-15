@@ -179,11 +179,6 @@ export class PresentationStore {
   }
 
   @computed
-  get showResult(): boolean {
-    return Boolean(this._result);
-  }
-
-  @computed
   get expression(): ExpressionValue[] {
     const result = this._expression.length ? [...this._expression] : [{ value: START_VALUE, bold: false, level: 0 }];
 

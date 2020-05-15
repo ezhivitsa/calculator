@@ -9,7 +9,7 @@ import {
   MeasurementType,
   PostfixModifier,
 } from 'stores/types';
-import { CommandType, Command } from 'services/types';
+import { CommandType, Command, Event } from 'services/types';
 
 import { validate, calculateResult as calculate } from 'services/event-handlers/calculation/calculation.store';
 
@@ -137,5 +137,19 @@ export function addValuePower(value: string): void {
 export function addRoot(): void {
   send({
     type: CommandType.ADD_ROOT,
+  });
+}
+
+export function addValueOrReplace(value: string): void {
+  send({
+    type: CommandType.ADD_VALUE_OR_REPLACE,
+    value,
+  });
+}
+
+export function addExpressionOrReplace(events: Event[]): void {
+  send({
+    type: CommandType.ADD_EXPRESSION_OR_REPLACE,
+    events,
   });
 }

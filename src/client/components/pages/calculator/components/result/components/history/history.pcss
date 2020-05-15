@@ -41,6 +41,17 @@
     border-radius: var(--border-radius-300);
   }
 
+  &__items-container {
+    max-height: 200px;
+    overflow: auto;
+    margin-top: var(--grid4);
+
+    &._has-scroll {
+      padding-top: var(--grid4);
+      border-top: 1px solid var(--color-grey-200);
+    }
+  }
+
   &__placeholder {
     text-align: center;
     line-height: var(--font-size-700);

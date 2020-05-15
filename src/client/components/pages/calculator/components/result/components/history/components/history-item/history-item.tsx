@@ -18,10 +18,12 @@ export function HistoryItem({ item, onClick }: Props): ReactElement {
 
   function handleExpressionClick(): void {
     onClick();
+    item.setExpressionAsCurrent();
   }
 
   function handleResultClick(): void {
     onClick();
+    item.setResultAsCurrent();
   }
 
   return (

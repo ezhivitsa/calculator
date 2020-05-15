@@ -28,6 +28,8 @@ export enum CommandType {
   ADD_POWER_FOR_VALUE = 'add-power-for-values',
   ADD_VALUE_POWER = 'add-value-power',
   ADD_ROOT = 'add-root',
+  ADD_VALUE_OR_REPLACE = 'add-value-or-replace',
+  ADD_EXPRESSION_OR_REPLACE = 'add-expression-or-replace',
 }
 
 export interface BaseCommand {
@@ -76,6 +78,14 @@ export interface AddValuePowerCommand extends BaseCommand {
   value: string;
 }
 
+export interface AddValueOrReplaceCommand extends BaseCommand {
+  value: string;
+}
+
+export interface AddExpressionOrReplaceCommand extends BaseCommand {
+  events: Event[];
+}
+
 export type Command =
   | BaseCommand
   | AddValueCommand
@@ -87,7 +97,9 @@ export type Command =
   | AddPostfixModifierCommand
   | AddPowerForConstantCommand
   | AddPowerForValueCommand
-  | AddValuePowerCommand;
+  | AddValuePowerCommand
+  | AddValueOrReplaceCommand
+  | AddExpressionOrReplaceCommand;
 
 export type CommandTypeMapping = {
   [CommandType.INIT]: BaseCommand;
@@ -107,6 +119,9 @@ export type CommandTypeMapping = {
   [CommandType.ADD_POWER_FOR_CONSTANT]: AddPowerForConstantCommand;
   [CommandType.ADD_POWER_FOR_VALUE]: AddPowerForValueCommand;
   [CommandType.ADD_VALUE_POWER]: AddValuePowerCommand;
+  [CommandType.ADD_ROOT]: BaseCommand;
+  [CommandType.ADD_VALUE_OR_REPLACE]: AddValueOrReplaceCommand;
+  [CommandType.ADD_EXPRESSION_OR_REPLACE]: AddExpressionOrReplaceCommand;
 };
 
 // Events
@@ -196,4 +211,5 @@ export type EventTypeMapping = {
   [EventType.EXPONENT_VALUE_CHANGED]: ExponentValueChangedEvent;
   [EventType.POWER_ADDED]: BaseEvent;
   [EventType.POWER_FINISHED]: BaseEvent;
+  [EventType.ROOT_ADDED]: BaseEvent;
 };

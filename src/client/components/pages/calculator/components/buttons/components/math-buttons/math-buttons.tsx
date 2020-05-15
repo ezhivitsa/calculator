@@ -6,7 +6,7 @@ import { Button } from 'components/global/button';
 
 import { MathOperation } from 'stores';
 import { addAction, cleanAll, clean } from 'services/app/calculation.app-service';
-import { usePresentationStore } from 'providers';
+import { useHistoryStore } from 'providers';
 
 import { LONG_PRESS_TIMEOUT } from 'constants/app';
 import { operationTexts, cleanButtonTexts } from 'texts';
@@ -25,7 +25,8 @@ const buttons: {
 
 export const MathButtons = observer(
   (): ReactElement => {
-    const presentationStore = usePresentationStore();
+    const { lastCalculatedExpression } = useHistoryStore();
+
     let timeout: number | null = null;
 
     function handleButtonClick(action: MathOperation): void {
@@ -51,7 +52,7 @@ export const MathButtons = observer(
       clearTimeout(timeout);
       timeout = null;
 
-      if (!presentationStore.showResult) {
+      if (!lastCalculatedExpression) {
         clean();
       } else {
         cleanAll();
@@ -59,7 +60,7 @@ export const MathButtons = observer(
     }
 
     function renderCleanButton(): ReactNode {
-      const text = presentationStore.showResult ? cleanButtonTexts.cleanResult : cleanButtonTexts.cleanOne;
+      const text = lastCalculatedExpression ? cleanButtonTexts.cleanResult : cleanButtonTexts.cleanOne;
       return (
         <Button
           className={classnames(styles.mathButtons__btn, styles._clean)}

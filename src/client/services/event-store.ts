@@ -6,6 +6,10 @@ export function addEvent(event: Event): void {
   events.push(event);
 }
 
+export function getDataEvents(): Event[] {
+  return events.filter((e) => e.type !== EventType.RESULT_CALCULATED && e.type !== EventType.INITIALIZED);
+}
+
 export function getEvents(): Event[] {
   return [...events];
 }

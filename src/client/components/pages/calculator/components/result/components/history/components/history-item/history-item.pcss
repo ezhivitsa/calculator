@@ -1,7 +1,11 @@
 .history-item {
   display: flex;
   align-items: stretch;
-  margin-top: var(--grid4);
+  margin-bottom: 1px;
+
+  &:not(:first-of-type) {
+    margin-top: var(--grid4);
+  }
 
   &__part {
     padding: var(--grid1) var(--grid2);

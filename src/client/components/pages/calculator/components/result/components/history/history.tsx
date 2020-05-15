@@ -16,9 +16,12 @@ import styles from './history.pcss';
 export const History = observer(
   (): ReactElement => {
     const [showItems, setShowItems] = useState(false);
+    const [hasScroll, setHasScroll] = useState(false);
+
     const history = useHistoryStore();
 
     const container = useRef<HTMLDivElement>(null);
+    const historyContainer = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
       function handleDocumentClick(event: MouseEvent): void {
@@ -38,6 +41,16 @@ export const History = observer(
         document.removeEventListener('click', handleDocumentClick);
       };
     }, []);
+
+    useEffect(() => {
+      const { current } = historyContainer;
+      if (current) {
+        const hasVerticalScrollbar = current.scrollHeight > current.clientHeight;
+        if (hasVerticalScrollbar !== hasScroll) {
+          setHasScroll(hasVerticalScrollbar);
+        }
+      }
+    });
 
     function handleToggleShowItems(): void {
       setShowItems(!showItems);
@@ -65,7 +78,16 @@ export const History = observer(
         return null;
       }
 
-      return <div className={styles.history__items}>{renderItems()}</div>;
+      return (
+        <div className={styles.history__items}>
+          <div
+            className={classnames(styles.history__itemsContainer, { [styles._hasScroll]: hasScroll })}
+            ref={historyContainer}
+          >
+            {renderItems()}
+          </div>
+        </div>
+      );
     }
 
     return (

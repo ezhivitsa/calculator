@@ -1,7 +1,9 @@
 import React, { ReactElement } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { usePresentationStore } from 'providers';
+import { usePresentationStore, useHistoryStore } from 'providers';
+
+import { buttonTexts } from 'texts';
 
 import { Expression } from 'components/global/expression';
 
@@ -11,22 +13,29 @@ import styles from './result.pcss';
 
 export const Result = observer(
   (): ReactElement => {
-    const { expression, showTemplateForNewLevel, showResult, result } = usePresentationStore();
+    const { expression, showTemplateForNewLevel, result } = usePresentationStore();
+    const { answer, lastCalculatedExpression } = useHistoryStore();
 
     return (
       <div className={styles.result}>
         <History />
 
-        {showResult && (
+        {lastCalculatedExpression && (
           <div className={styles.result__topExpression}>
-            <Expression expression={expression} />
+            <Expression expression={lastCalculatedExpression} />
             <span> =</span>
+          </div>
+        )}
+
+        {!lastCalculatedExpression && answer && (
+          <div className={styles.result__topExpression}>
+            {buttonTexts.ans} = {answer}
           </div>
         )}
 
         <div className={styles.result__expression}>
           <Expression
-            expression={showResult ? result : expression}
+            expression={lastCalculatedExpression ? result : expression}
             showTemplateForNewLevel={showTemplateForNewLevel}
             highlightImaginaryPart
           />

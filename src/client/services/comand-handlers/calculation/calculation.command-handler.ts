@@ -12,11 +12,13 @@ import {
   AddPowerForConstantCommand,
   AddPowerForValueCommand,
   AddValuePowerCommand,
+  AddValueOrReplaceCommand,
+  AddExpressionOrReplaceCommand,
 } from 'services/types';
 
 import { handle } from 'services/command-bus';
-import { apply } from 'services/event-bus';
-import { getEvents } from 'services/event-store';
+import { apply, restore } from 'services/event-bus';
+import { getDataEvents, removeLastEvent, removeAllEvents } from 'services/event-store';
 
 import {
   isCurrentExponent,
@@ -24,17 +26,38 @@ import {
   isOperationSign,
   getExponentValue,
   getValue,
+  getResult,
   shouldRemoveLast,
   shouldChangeLevel,
   canAddOperation,
   canAddRightParentheses,
   canAddExponent,
   canAddPower,
+  canAddValue,
   shouldAddMultiplyBeforeValue,
 } from './calculation.state';
 
-import { restore } from 'services/event-bus';
-import { removeLastEvent, removeAllEvents } from 'services/event-store';
+function setLastAnswer(): void {
+  const result = getResult();
+  if (result) {
+    removeAllEvents();
+    restore();
+
+    apply({
+      type: EventType.VALUE_CHANGED,
+      value: result,
+      addedValue: result,
+    });
+  }
+}
+
+function removeAllEventsIfLastResult(): void {
+  const result = getResult();
+  if (result) {
+    removeAllEvents();
+    restore();
+  }
+}
 
 function addMathConstant(constant: MathConstant, constantValue: string | null = null): void {
   while (shouldChangeLevel()) {
@@ -87,6 +110,8 @@ handle(CommandType.INIT, (): void => {
 });
 
 handle(CommandType.ADD_VALUE, (command: AddValueCommand): void => {
+  removeAllEventsIfLastResult();
+
   if (isCurrentExponent()) {
     const value = getExponentValue(command.value);
     if (value === null) {
@@ -127,6 +152,8 @@ handle(CommandType.ADD_VALUE, (command: AddValueCommand): void => {
 });
 
 handle(CommandType.ADD_MATH_OPERATION, (command: AddMathOperationCommand): void => {
+  setLastAnswer();
+
   if (isOperationSign(command.operation)) {
     // ToDo: use constant
     apply({
@@ -159,6 +186,8 @@ handle(CommandType.ADD_MATH_OPERATION, (command: AddMathOperationCommand): void 
 });
 
 handle(CommandType.ADD_LEFT_PARENTHESES, (): void => {
+  removeAllEventsIfLastResult();
+
   apply({
     type: EventType.LEFT_PARENTHESES_ADDED,
   });
@@ -189,6 +218,8 @@ handle(CommandType.REMOVE_ALL_SYMBOLS, (): void => {
 });
 
 handle(CommandType.ADD_PREFIX_MODIFIER, (command: AddPrefixModifierCommand): void => {
+  removeAllEventsIfLastResult();
+
   apply({
     type: EventType.PREFIX_MODIFIER_ADDED,
     modifier: command.modifier,
@@ -196,6 +227,8 @@ handle(CommandType.ADD_PREFIX_MODIFIER, (command: AddPrefixModifierCommand): voi
 });
 
 handle(CommandType.ADD_POSTFIX_MODIFIER, (command: AddPostfixModifierCommand): void => {
+  setLastAnswer();
+
   apply({
     type: EventType.POSTFIX_MODIFIER_ADDED,
     modifier: command.modifier,
@@ -203,15 +236,21 @@ handle(CommandType.ADD_POSTFIX_MODIFIER, (command: AddPostfixModifierCommand): v
 });
 
 handle(CommandType.ADD_MATH_CONSTANT, (command: AddConstantCommand): void => {
+  removeAllEventsIfLastResult();
   addMathConstant(command.constant, command.value);
 });
 
 handle(CommandType.CALCULATE_RESULT, (command: CalculateResultCommand): void => {
+  const events = getDataEvents();
+
+  removeAllEvents();
+  restore();
+
   apply({
     type: EventType.RESULT_CALCULATED,
     result: command.result,
     expression: command.expression,
-    events: getEvents(),
+    events,
   });
 });
 
@@ -223,6 +262,8 @@ handle(CommandType.SET_MEASUREMENT, (command: SetMeasurementCommand): void => {
 });
 
 handle(CommandType.ADD_EXPONENT, (): void => {
+  setLastAnswer();
+
   if (canAddExponent()) {
     apply({
       type: EventType.EXPONENT_ADDED,
@@ -231,6 +272,8 @@ handle(CommandType.ADD_EXPONENT, (): void => {
 });
 
 handle(CommandType.ADD_POWER, (): void => {
+  setLastAnswer();
+
   if (canAddPower()) {
     apply({
       type: EventType.POWER_ADDED,
@@ -239,6 +282,8 @@ handle(CommandType.ADD_POWER, (): void => {
 });
 
 handle(CommandType.ADD_POWER_FOR_CONSTANT, (command: AddPowerForConstantCommand): void => {
+  removeAllEventsIfLastResult();
+
   addMathConstant(command.constant);
   apply({
     type: EventType.POWER_ADDED,
@@ -246,6 +291,8 @@ handle(CommandType.ADD_POWER_FOR_CONSTANT, (command: AddPowerForConstantCommand)
 });
 
 handle(CommandType.ADD_POWER_FOR_VALUE, (command: AddPowerForValueCommand): void => {
+  removeAllEventsIfLastResult();
+
   if (shouldAddMultiplyBeforeValue()) {
     apply({
       type: EventType.MATH_OPERATION_ADDED,
@@ -267,6 +314,8 @@ handle(CommandType.ADD_POWER_FOR_VALUE, (command: AddPowerForValueCommand): void
 });
 
 handle(CommandType.ADD_VALUE_POWER, (command: AddValuePowerCommand): void => {
+  setLastAnswer();
+
   if (!canAddPower()) {
     return;
   }
@@ -285,9 +334,35 @@ handle(CommandType.ADD_VALUE_POWER, (command: AddValuePowerCommand): void => {
 });
 
 handle(CommandType.ADD_ROOT, (): void => {
+  setLastAnswer();
+
   if (canAddPower()) {
     apply({
       type: EventType.ROOT_ADDED,
     });
+  }
+});
+
+handle(CommandType.ADD_VALUE_OR_REPLACE, (command: AddValueOrReplaceCommand): void => {
+  if (!canAddValue()) {
+    removeAllEvents();
+    restore();
+  }
+
+  apply({
+    type: EventType.VALUE_CHANGED,
+    value: command.value,
+    addedValue: command.value,
+  });
+});
+
+handle(CommandType.ADD_EXPRESSION_OR_REPLACE, (command: AddExpressionOrReplaceCommand): void => {
+  if (!canAddValue()) {
+    removeAllEvents();
+    restore();
+  }
+
+  for (const event of command.events) {
+    apply({ ...event });
   }
 });

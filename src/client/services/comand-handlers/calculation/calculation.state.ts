@@ -1,7 +1,13 @@
 import { isNumber, isNaturalNumber, isRealNumber } from 'lib/numbers';
 
 import { MathOperation } from 'stores/types';
-import { ValueChangedEvent, OperationAddedEvent, EventType, ExponentValueChangedEvent } from 'services/types';
+import {
+  ValueChangedEvent,
+  OperationAddedEvent,
+  EventType,
+  ExponentValueChangedEvent,
+  ResultCalculatedEvent,
+} from 'services/types';
 
 import { handle } from 'services/event-bus';
 
@@ -20,6 +26,7 @@ enum ExpressionItem {
   POSTFIX_MODIFIER,
   LEFT_PARENTHESES,
   RIGHT_PARENTHESES,
+  RESULT,
 }
 
 interface Level {
@@ -167,6 +174,15 @@ handle(EventType.ROOT_ADDED, (): void => {
   addLevel();
 });
 
+handle(EventType.RESULT_CALCULATED, ({ result }: ResultCalculatedEvent): void => {
+  const level = getLastLevel();
+
+  if (result) {
+    addToLevel(ExpressionItem.RESULT);
+    level.currentValue = result;
+  }
+});
+
 export function isCurrentExponent(): boolean {
   const [beforeLast, last] = getLastTwoExpressionItems();
   return last === ExpressionItem.EXPONENT || (last === ExpressionItem.VALUE && beforeLast === ExpressionItem.EXPONENT);
@@ -261,6 +277,16 @@ export function canAddPower(): boolean {
   );
 }
 
+export function canAddValue(): boolean {
+  const item = getLastExpressionItem();
+  return (
+    item === null ||
+    item === ExpressionItem.PRIORITY_MATH_OPERATION ||
+    item === ExpressionItem.NON_PRIORITY_MATH_OPERATION ||
+    item === ExpressionItem.RIGHT_PARENTHESES
+  );
+}
+
 export function getExponentValue(value: string): string | null {
   const level = getLastLevel();
   const resultValue = level.currentValue + value;
@@ -281,4 +307,14 @@ export function getValue(value: string): string | null {
   }
 
   return null;
+}
+
+export function getResult(): string | null {
+  const item = getLastExpressionItem();
+  if (item !== ExpressionItem.RESULT) {
+    return null;
+  }
+
+  const level = getLastLevel();
+  return level.currentValue;
 }

@@ -9,6 +9,7 @@ import {
   MeasurementChangedEvent,
   PostfixModifierAddedEvent,
   ExponentValueChangedEvent,
+  ResultCalculatedEvent,
 } from 'services/types';
 
 import {

@@ -3,6 +3,8 @@
 import type { CalculationData } from 'pkg/calculator';
 import { MathOperation, PrefixModifier, MeasurementType, PostfixModifier } from 'stores/types';
 
+import { NAN_STRING } from 'constants/app';
+
 type Action<T> = {
   resolve: (data: T) => void;
   reject: () => void;
@@ -85,7 +87,7 @@ export class CalculatorAdapter {
     return this._waitInitInstance((instance: CalculationData) => {
       try {
         const result = instance.calculate();
-        return result;
+        return result !== NAN_STRING ? result : '';
       } catch (err) {
         return '';
       }

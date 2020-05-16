@@ -11,7 +11,7 @@ import {
 
 import { handle } from 'services/event-bus';
 
-const SIGN = '-';
+import { MINUS_SIGN } from 'constants/app';
 
 const PRIORITY_OPERATIONS = [MathOperation.Divide, MathOperation.Multiply];
 
@@ -112,7 +112,7 @@ handle(EventType.VALUE_CHANGED, ({ value }: ValueChangedEvent): void => {
   const level = getLastLevel();
   level.currentValue = value;
 
-  if (value === SIGN) {
+  if (value === MINUS_SIGN) {
     level.expression.push(ExpressionItem.VALUE_SIGN);
     return;
   }
@@ -207,6 +207,11 @@ export function isOperationSign(operation: MathOperation): boolean {
   );
 }
 
+export function isEmpty(): boolean {
+  const item = getLastExpressionItem();
+  return item === null && stateData.levels.length === 1;
+}
+
 export function shouldRemoveLast(): boolean {
   const item = getLastExpressionItem();
   return (
@@ -261,7 +266,7 @@ export function canAddRightParentheses(): boolean {
 
 export function canAddExponent(): boolean {
   const level = getLastLevel();
-  return isRealNumber(level.currentValue);
+  return isRealNumber(level.currentValue) || isNaturalNumber(level.currentValue);
 }
 
 export function canAddPower(): boolean {
@@ -285,6 +290,11 @@ export function canAddValue(): boolean {
     item === ExpressionItem.NON_PRIORITY_MATH_OPERATION ||
     item === ExpressionItem.RIGHT_PARENTHESES
   );
+}
+
+export function canAddPostfixModifier(): boolean {
+  const item = getLastExpressionItem();
+  return item === ExpressionItem.VALUE || item === ExpressionItem.RIGHT_PARENTHESES;
 }
 
 export function getExponentValue(value: string): string | null {

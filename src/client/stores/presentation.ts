@@ -1,8 +1,9 @@
-import { action, observable, computed } from 'mobx';
+import { action, observable, computed, runInAction } from 'mobx';
 
 import { handle } from 'services/event-bus';
 
 import { countParenthesis } from 'lib/strings';
+import { ERROR, START_VALUE } from 'constants/app';
 
 import { operationTexts, expressionTexts, buttonTexts } from 'texts';
 
@@ -65,13 +66,15 @@ const constantRepresentation: {
   [MathConstant.Random]: buttonTexts.rnd,
 };
 
-const START_VALUE = '0';
-const ERROR = 'Error';
+const ANIMATE_TIMEOUT = 20;
 
 export class PresentationStore {
   @observable private _expression: ExpressionValue[] = [];
   @observable private _result = '';
   @observable private _currentLevel = 0;
+  @observable private _animate = false;
+
+  private _timeout: number | null = null;
 
   constructor() {
     this._initHandlers();
@@ -191,6 +194,11 @@ export class PresentationStore {
   }
 
   @computed
+  get animate(): boolean {
+    return this._animate;
+  }
+
+  @computed
   get showTemplateForNewLevel(): boolean {
     const expression = this._expression;
     const level = expression.length ? expression[expression.length - 1].level : 0;
@@ -300,4 +308,18 @@ export class PresentationStore {
     this._addToExpression(expressionTexts.squareRoot, true);
     this._currentLevel += 1;
   };
+
+  @action
+  setAnimate(): void {
+    if (this._timeout) {
+      clearTimeout(this._timeout);
+    }
+
+    this._animate = true;
+    this._timeout = window.setTimeout(() => {
+      runInAction(() => {
+        this._animate = false;
+      });
+    }, ANIMATE_TIMEOUT);
+  }
 }

@@ -247,3 +247,15 @@ fn should_calculate_expression_with_difficult_root() {
   // (9 - 6)√(5 + 3)√(14 + 2) == 4
   assert_eq!(calculation_data.calculate(), "4");
 }
+
+#[test]
+fn should_calculate_value_with_negative_exponent() {
+  let mut calculation_data = CalculationData::new();
+
+  calculation_data.set_value("5");
+  calculation_data.add_exp();
+  calculation_data.set_power("-2");
+
+  // 5E-2 == 0.05
+  assert_eq!(calculation_data.calculate(), "0.05");
+}

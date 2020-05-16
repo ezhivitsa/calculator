@@ -1,8 +1,11 @@
 import React, { ReactElement } from 'react';
+import classnames from 'classnames';
 
 import { CalculationHistory } from 'stores';
 
 import { Expression } from 'components/global/expression';
+
+import { ERROR } from 'constants/app';
 
 import { numberButtonTexts } from 'texts';
 
@@ -15,6 +18,7 @@ interface Props {
 
 export function HistoryItem({ item, onClick }: Props): ReactElement {
   const { expression, result } = item;
+  const error = !result;
 
   function handleExpressionClick(): void {
     onClick();
@@ -34,8 +38,11 @@ export function HistoryItem({ item, onClick }: Props): ReactElement {
 
       <span className={styles.historyItem__equals}>{numberButtonTexts.equals}</span>
 
-      <button className={styles.historyItem__part} onClick={handleResultClick}>
-        {result}
+      <button
+        className={classnames(styles.historyItem__part, { [styles._disabled]: error })}
+        onClick={handleResultClick}
+      >
+        {error ? ERROR : result}
       </button>
     </div>
   );

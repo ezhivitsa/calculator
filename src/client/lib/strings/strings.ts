@@ -1,6 +1,4 @@
-// ToDo: use from common constants
-const LEFT_PARENTHESIS = '(';
-const RIGHT_PARENTHESIS = ')';
+import { LEFT_PARENTHESIS, RIGHT_PARENTHESIS } from 'constants/app';
 
 export function countParenthesis(value: string): number {
   let result = 0;

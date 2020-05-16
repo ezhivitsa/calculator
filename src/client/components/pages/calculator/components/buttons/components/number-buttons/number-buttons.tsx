@@ -64,6 +64,7 @@ export function NumberButtons(): ReactElement {
 
   function handleResultClick(): void {
     calculateResult(presentationStore.expression);
+    presentationStore.setAnimate();
   }
 
   function handleNumberClick(number: string): void {

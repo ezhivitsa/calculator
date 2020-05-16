@@ -2,6 +2,8 @@ import { MathOperation, PrefixModifier, MeasurementType, PostfixModifier } from 
 
 import { CalculatorAdapter } from 'adapters/calculator';
 
+import { format } from 'lib/numbers';
+
 const adapter = new CalculatorAdapter();
 
 export function addLeftParentheses(): void {
@@ -24,8 +26,9 @@ export function clean(): void {
   adapter.clean();
 }
 
-export function calculateResult(): Promise<string> {
-  return adapter.calculate();
+export async function calculateResult(): Promise<string> {
+  const calculationResult = await adapter.calculate();
+  return format(calculationResult);
 }
 
 export function validate(): Promise<boolean> {

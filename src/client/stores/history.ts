@@ -97,7 +97,9 @@ export class HistoryStore {
   private _handleResultCalculated = ({ expression, result, events }: ResultCalculatedEvent): void => {
     this._history.push(new CalculationHistory(expression, result, events));
 
-    this._answer = result;
+    if (result) {
+      this._answer = result;
+    }
     this._lastCalculatedExpression = expression;
   };
 
@@ -105,4 +107,9 @@ export class HistoryStore {
   private _handleClearCalculatedExpression = (): void => {
     this._lastCalculatedExpression = null;
   };
+
+  @action
+  removeLastExpression(): void {
+    this._lastCalculatedExpression = null;
+  }
 }

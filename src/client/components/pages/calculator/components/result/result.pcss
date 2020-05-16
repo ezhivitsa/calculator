@@ -1,7 +1,7 @@
 @import 'variables.pcss';
 
 .result {
-  padding: var(--grid3);
+  padding: var(--grid3) var(--grid3) 0;
   border-radius: var(--border-radius-300);
   border: 1px solid var(--color-grey-300);
   position: relative;
@@ -11,8 +11,16 @@
   }
 
   &__expression {
+    height: var(--grid11);
+    overflow: hidden;
     text-align: right;
     font-size: var(--font-size-900);
+    transition: line-height 0.2s;
+
+    &._animate {
+      transition: line-height 0s;
+      line-height: 4;
+    }
   }
 
   &__top-expression {
@@ -21,6 +29,14 @@
     color: var(--color-grey-500);
     top: var(--grid2);
     right: var(--grid3);
+    transition: height 0.2s, font-size 0.2s, color 0.2s;
+
+    &._animate {
+      transition: height 0s,font-size 0s,color 0s;
+      color: var(--color-grey-900);
+      font-size: 170%;
+      height: 300%;
+    }
   }
 
   &__imaginary {

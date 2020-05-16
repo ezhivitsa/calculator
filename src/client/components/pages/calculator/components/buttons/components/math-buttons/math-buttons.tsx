@@ -25,7 +25,8 @@ const buttons: {
 
 export const MathButtons = observer(
   (): ReactElement => {
-    const { lastCalculatedExpression } = useHistoryStore();
+    const history = useHistoryStore();
+    const { lastCalculatedExpression } = history;
 
     let timeout: number | null = null;
 
@@ -57,6 +58,7 @@ export const MathButtons = observer(
       } else {
         cleanAll();
       }
+      history.removeLastExpression();
     }
 
     function renderCleanButton(): ReactNode {

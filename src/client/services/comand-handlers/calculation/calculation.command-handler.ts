@@ -20,10 +20,13 @@ import { handle } from 'services/command-bus';
 import { apply, restore } from 'services/event-bus';
 import { getDataEvents, removeLastEvent, removeAllEvents } from 'services/event-store';
 
+import { ZERO_VALUE, MINUS_SIGN } from 'constants/app';
+
 import {
   isCurrentExponent,
   isCurrentConstant,
   isOperationSign,
+  isEmpty,
   getExponentValue,
   getValue,
   getResult,
@@ -34,6 +37,7 @@ import {
   canAddExponent,
   canAddPower,
   canAddValue,
+  canAddPostfixModifier,
   shouldAddMultiplyBeforeValue,
 } from './calculation.state';
 
@@ -103,6 +107,18 @@ function addMathConstant(constant: MathConstant, constantValue: string | null = 
   });
 }
 
+function addZeroIfEmpty(): void {
+  if (!isEmpty()) {
+    return;
+  }
+
+  apply({
+    type: EventType.VALUE_CHANGED,
+    value: ZERO_VALUE,
+    addedValue: ZERO_VALUE,
+  });
+}
+
 handle(CommandType.INIT, (): void => {
   apply({
     type: EventType.INITIALIZED,
@@ -155,11 +171,19 @@ handle(CommandType.ADD_MATH_OPERATION, (command: AddMathOperationCommand): void 
   setLastAnswer();
 
   if (isOperationSign(command.operation)) {
-    // ToDo: use constant
+    if (isCurrentExponent()) {
+      apply({
+        type: EventType.EXPONENT_VALUE_CHANGED,
+        addedValue: MINUS_SIGN,
+        value: MINUS_SIGN,
+      });
+      return;
+    }
+
     apply({
       type: EventType.VALUE_CHANGED,
-      addedValue: '-',
-      value: '-',
+      addedValue: MINUS_SIGN,
+      value: MINUS_SIGN,
     });
     return;
   }
@@ -175,14 +199,13 @@ handle(CommandType.ADD_MATH_OPERATION, (command: AddMathOperationCommand): void 
     });
   }
 
+  addZeroIfEmpty();
   if (canAddOperation()) {
     apply({
       type: EventType.MATH_OPERATION_ADDED,
       operation: command.operation,
     });
   }
-
-  // ToDo: add logic when we add command as first element in expression
 });
 
 handle(CommandType.ADD_LEFT_PARENTHESES, (): void => {
@@ -228,11 +251,14 @@ handle(CommandType.ADD_PREFIX_MODIFIER, (command: AddPrefixModifierCommand): voi
 
 handle(CommandType.ADD_POSTFIX_MODIFIER, (command: AddPostfixModifierCommand): void => {
   setLastAnswer();
+  addZeroIfEmpty();
 
-  apply({
-    type: EventType.POSTFIX_MODIFIER_ADDED,
-    modifier: command.modifier,
-  });
+  if (canAddPostfixModifier()) {
+    apply({
+      type: EventType.POSTFIX_MODIFIER_ADDED,
+      modifier: command.modifier,
+    });
+  }
 });
 
 handle(CommandType.ADD_MATH_CONSTANT, (command: AddConstantCommand): void => {

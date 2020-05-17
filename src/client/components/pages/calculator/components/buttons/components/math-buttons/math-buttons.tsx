@@ -1,4 +1,4 @@
-import React, { ReactElement, ReactNode } from 'react';
+import React, { useEffect, ReactElement, ReactNode } from 'react';
 import { observer } from 'mobx-react-lite';
 import classnames from 'classnames';
 
@@ -9,6 +9,7 @@ import { addAction, cleanAll, clean } from 'services/app/calculation.app-service
 import { useHistoryStore } from 'providers';
 
 import { LONG_PRESS_TIMEOUT } from 'constants/app';
+import { KeyCodes } from 'constants/buttons';
 import { operationTexts, cleanButtonTexts } from 'texts';
 
 import styles from './math-buttons.pcss';
@@ -16,11 +17,12 @@ import styles from './math-buttons.pcss';
 const buttons: {
   type: MathOperation;
   text: string;
+  keyCodes: string | string[];
 }[] = [
-  { type: MathOperation.Divide, text: operationTexts.divide },
-  { type: MathOperation.Multiply, text: operationTexts.multiply },
-  { type: MathOperation.Minus, text: operationTexts.minus },
-  { type: MathOperation.Plus, text: operationTexts.plus },
+  { type: MathOperation.Divide, text: operationTexts.divide, keyCodes: KeyCodes.Divide },
+  { type: MathOperation.Multiply, text: operationTexts.multiply, keyCodes: KeyCodes.Multiply },
+  { type: MathOperation.Minus, text: operationTexts.minus, keyCodes: KeyCodes.Minus },
+  { type: MathOperation.Plus, text: operationTexts.plus, keyCodes: KeyCodes.Plus },
 ];
 
 export const MathButtons = observer(
@@ -60,6 +62,38 @@ export const MathButtons = observer(
       }
       history.removeLastExpression();
     }
+
+    useEffect(() => {
+      function handleKeyDown(event: KeyboardEvent): void {
+        if (event.key === KeyCodes.Shift) {
+          return;
+        }
+
+        const button = buttons.find((b): boolean => {
+          if (b.keyCodes instanceof Array) {
+            return b.keyCodes.includes(event.key);
+          }
+
+          return b.keyCodes === event.key;
+        });
+
+        if (button) {
+          handleButtonClick(button.type);
+          return;
+        }
+
+        if (event.key === KeyCodes.Backspace) {
+          clean();
+          event.preventDefault();
+        }
+      }
+
+      document.addEventListener('keydown', handleKeyDown);
+
+      return function cleanup() {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    });
 
     function renderCleanButton(): ReactNode {
       const text = lastCalculatedExpression ? cleanButtonTexts.cleanResult : cleanButtonTexts.cleanOne;

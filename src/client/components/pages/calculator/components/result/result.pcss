@@ -16,6 +16,9 @@
     text-align: right;
     font-size: var(--font-size-900);
     transition: line-height 0.2s;
+    white-space: nowrap;
+    display: flex;
+    justify-content: flex-end;
 
     &._animate {
       transition: line-height 0s;
@@ -30,6 +33,11 @@
     top: var(--grid2);
     right: var(--grid3);
     transition: height 0.2s, font-size 0.2s, color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: calc(100% - var(--grid13));
+    display: flex;
+    justify-content: flex-end;
 
     &._animate {
       transition: height 0s,font-size 0s,color 0s;

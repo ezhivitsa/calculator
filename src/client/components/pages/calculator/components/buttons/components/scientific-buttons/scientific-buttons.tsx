@@ -1,4 +1,4 @@
-import React, { useState, ReactElement, ReactNode } from 'react';
+import React, { useState, useEffect, ReactElement, ReactNode } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { PrefixModifier, MathConstant, MeasurementType, PostfixModifier } from 'stores';
@@ -18,16 +18,18 @@ import {
 import { useCalculatorStore, useHistoryStore } from 'providers';
 
 import { buttonTexts, measurementTypeTexts } from 'texts/buttons';
+import { KeyCodes } from 'constants/buttons';
 
 import { Button } from 'components/global/button';
 import { Toggle } from 'components/global/toggle';
 
 import styles from './scientific-buttons.pcss';
 
-interface Button {
+interface ButtonData {
   title: ReactNode;
   onClick: () => void;
   inverse?: boolean;
+  keyCodes?: string | string[];
 }
 
 export const ScientificButtons = observer(
@@ -86,10 +88,11 @@ export const ScientificButtons = observer(
       setShowInverse(false);
     }
 
-    const buttons: Button[] = [
+    const buttons: ButtonData[] = [
       {
         title: `${buttonTexts.x}${buttonTexts.factorial}`,
         onClick: () => handlePostfixModifierClick(PostfixModifier.Factorial),
+        keyCodes: KeyCodes.ExclamationPoint,
       },
       {
         title: buttonTexts.inversion,
@@ -99,6 +102,7 @@ export const ScientificButtons = observer(
         title: buttonTexts.sinus,
         inverse: false,
         onClick: () => handleModifierClick(PrefixModifier.Sin),
+        keyCodes: KeyCodes.S,
       },
       {
         title: (
@@ -109,11 +113,13 @@ export const ScientificButtons = observer(
         ),
         inverse: true,
         onClick: () => handleModifierClick(PrefixModifier.Asin),
+        keyCodes: KeyCodes.BigS,
       },
       {
         title: buttonTexts.logarithmNatural,
         inverse: false,
         onClick: () => handleModifierClick(PrefixModifier.Ln),
+        keyCodes: [KeyCodes.L, KeyCodes.BigL],
       },
       {
         title: (
@@ -128,11 +134,13 @@ export const ScientificButtons = observer(
       {
         title: buttonTexts.pi,
         onClick: () => handleConstantClick(MathConstant.Pi),
+        keyCodes: [KeyCodes.P, KeyCodes.BigP],
       },
       {
         title: buttonTexts.cosine,
         inverse: false,
         onClick: () => handleModifierClick(PrefixModifier.Cos),
+        keyCodes: KeyCodes.C,
       },
       {
         title: (
@@ -143,11 +151,13 @@ export const ScientificButtons = observer(
         ),
         inverse: true,
         onClick: () => handleModifierClick(PrefixModifier.Acos),
+        keyCodes: KeyCodes.BigC,
       },
       {
         title: buttonTexts.logarithm,
         inverse: false,
         onClick: () => handleModifierClick(PrefixModifier.Log),
+        keyCodes: [KeyCodes.G, KeyCodes.BigG],
       },
       {
         title: (
@@ -162,11 +172,13 @@ export const ScientificButtons = observer(
       {
         title: buttonTexts.e,
         onClick: () => handleConstantClick(MathConstant.E),
+        keyCodes: KeyCodes.E,
       },
       {
         title: buttonTexts.tangent,
         inverse: false,
         onClick: () => handleModifierClick(PrefixModifier.Tan),
+        keyCodes: KeyCodes.T,
       },
       {
         title: (
@@ -177,6 +189,7 @@ export const ScientificButtons = observer(
         ),
         inverse: true,
         onClick: () => handleModifierClick(PrefixModifier.Atan),
+        keyCodes: KeyCodes.BigT,
       },
       {
         title: buttonTexts.sqrt,
@@ -197,15 +210,18 @@ export const ScientificButtons = observer(
         title: buttonTexts.ans,
         inverse: false,
         onClick: () => handleConstantClick(MathConstant.Answer, history.lastNumericResult),
+        keyCodes: [KeyCodes.A, KeyCodes.BigA],
       },
       {
         title: buttonTexts.rnd,
         inverse: true,
         onClick: () => handleConstantClick(MathConstant.Random),
+        keyCodes: KeyCodes.BigR,
       },
       {
         title: buttonTexts.exp,
         onClick: handleExpClick,
+        keyCodes: KeyCodes.BigE,
       },
       {
         title: (
@@ -229,8 +245,36 @@ export const ScientificButtons = observer(
         ),
         inverse: true,
         onClick: handleAddRoot,
+        keyCodes: KeyCodes.R,
       },
     ];
+
+    useEffect(() => {
+      function handleKeyDown(event: KeyboardEvent): void {
+        if (event.key === KeyCodes.Shift) {
+          return;
+        }
+
+        const button = buttons.find((b): boolean => {
+          if (b.keyCodes instanceof Array) {
+            return b.keyCodes.includes(event.key);
+          }
+
+          return b.keyCodes !== undefined && b.keyCodes === event.key;
+        });
+
+        if (button) {
+          button.onClick();
+          return;
+        }
+      }
+
+      document.addEventListener('keydown', handleKeyDown);
+
+      return function cleanup() {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    });
 
     function renderButtons(): ReactNode[] {
       return buttons

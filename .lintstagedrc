@@ -1,0 +1,12 @@
+{
+  "src/client/*.{js,jsx,ts,tsx}": [
+    "npx eslint \"src/client/**/*.{ts,tsx}\"",
+    "npx jest --config=jest.config.js --passWithNoTests"
+  ],
+  "src/client/*.{pcss}": [
+    "npx stylelint \"src/client/**/*.pcss\""
+  ],
+  "src/wasm/*.{rs}": [
+    "cargo test"
+  ]
+}

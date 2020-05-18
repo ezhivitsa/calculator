@@ -55,3 +55,10 @@ test-cargo:
 
 .PHONY: test
 test: lint-js lint-styles test-jest test-cargo
+
+.PHONY: deploy-gh-pages
+deploy-gh-pages:
+	npx gh-pages -d dist
+
+.PHONY: deploy
+deploy: build deploy-gh-pages

@@ -2,7 +2,6 @@
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![David Dependancy Status](https://david-dm.org/ezhivitsa/calculator.svg)](https://david-dm.org/ezhivitsa/calculator)
 
 [![Watch on GitHub](https://img.shields.io/github/watchers/ezhivitsa/calculator.svg?style=social&label=Watch)](https://github.com/ezhivitsa/calculator/watchers)
 [![Star on GitHub](https://img.shields.io/github/stars/ezhivitsa/calculator.svg?style=social&label=Stars)](https://github.com/ezhivitsa/calculator/stargazers)

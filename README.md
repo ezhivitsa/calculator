@@ -19,6 +19,10 @@ Calculator is based on the following primary technologies:
 
 Application structured in a way that allows us to write js code for frontend and rust code for webassembly at the same time and demonstrates some techniques how to write client-side code. In particular we use commands, events and appropriate handlers to achieve our goals.
 
+### Demo
+
+[https://ezhivitsa.github.io/calculator/](https://ezhivitsa.github.io/calculator/)
+
 ### How to start development
 
 Type the following command to install dependencies:

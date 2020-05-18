@@ -61,4 +61,6 @@ deploy-gh-pages:
 	npx gh-pages -d dist
 
 .PHONY: deploy
-deploy: build deploy-gh-pages
+deploy:
+	PUBLIC_PATH=calculator \
+	$(MAKE) build deploy-gh-pages

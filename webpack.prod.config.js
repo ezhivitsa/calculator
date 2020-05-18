@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const dist = path.resolve(__dirname, 'dist');
+const publicPath = process.env.PUBLIC_PATH ? `${process.env.PUBLIC_PATH}/` : '';
 
 module.exports = {
   mode: 'production',
@@ -14,7 +15,7 @@ module.exports = {
     path: dist,
     filename: '[name].js',
     chunkFilename: '[name].chunk.js',
-    publicPath: 'dist/',
+    publicPath: `/${publicPath}`,
   },
 
   optimization: {

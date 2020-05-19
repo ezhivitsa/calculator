@@ -79,4 +79,4 @@ $ make test
 
 ## License
 
-Koa react starter is released under the [MIT License](LICENSE).
+Calculator is released under the [MIT License](LICENSE).

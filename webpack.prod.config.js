@@ -14,8 +14,12 @@ module.exports = {
   output: {
     path: dist,
     filename: '[name].js',
-    chunkFilename: '[name].chunk.js',
+    chunkFilename: '[name].chunk.[chunkhash].js',
     publicPath: `/${publicPath}`,
+  },
+
+  experiments: {
+    asyncWebAssembly: true,
   },
 
   optimization: {
@@ -60,13 +64,12 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1,
               modules: {
                 mode: 'local',
                 localIdentName: '[local]--[hash:base64:5]',
-                context: path.resolve(__dirname, 'src/client'),
+                localIdentContext: path.resolve(__dirname, 'src/client'),
+                exportLocalsConvention: 'dashesOnly',
               },
-              localsConvention: 'dashesOnly',
             },
           },
           'postcss-loader',
@@ -80,8 +83,8 @@ module.exports = {
       template: './src/client/index.html',
     }),
     new MiniCssExtractPlugin({
-      filename: 'main.[hash].css',
-      chunkFilename: 'main.[id].[hash].css',
+      filename: 'main.[fullhash].css',
+      chunkFilename: 'main.[id].[chunkhash].css',
     }),
   ],
 };

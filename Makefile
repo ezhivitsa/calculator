@@ -11,7 +11,7 @@ clean: clean-dist clean-pkg
 
 .PHONY: build-wasm-pack
 build-wasm-pack:
-	wasm-pack build --out-dir pkg
+	wasm-pack build --out-dir pkg --target web --mode normal
 
 .PHONY: build-wasm
 build-wasm: clean-pkg build-wasm-pack
@@ -23,19 +23,23 @@ build-webpack:
 .PHONY: build-js
 build-js: clean-dist build-webpack
 
+.PHONY: copy-wasm
+copy-wasm:
+	npx cpy 'pkg/*.wasm' dist
+
 .PHONY: build
-build: build-wasm build-js
+build: build-wasm build-js copy-wasm
 
 .PHONY: webpack-dev
 webpack-dev:
-	npx webpack-dev-server --config webpack.dev.config.js
+	npx webpack serve --config webpack.dev.config.js
 
 .PHONY: dev
 dev: clean webpack-dev
 
 .PHONY: deps
 deps:
-	npm ci
+	yarn
 
 .PHONY: lint-js
 lint-js:

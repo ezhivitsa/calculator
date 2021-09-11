@@ -23,21 +23,19 @@ export function Toggle<T>(props: Props<T>): ReactElement {
   }
 
   function renderItems(): ReactElement[] {
-    return props.items.map(
-      (item): ReactElement => {
-        const isActive = item.value === props.value;
+    return props.items.map((item): ReactElement => {
+      const isActive = item.value === props.value;
 
-        return (
-          <div
-            key={item.text}
-            className={classnames(styles.toggle__item, { [styles._active]: isActive })}
-            onClick={() => handleItemClick(item)}
-          >
-            {item.text}
-          </div>
-        );
-      },
-    );
+      return (
+        <div
+          key={item.text}
+          className={classnames(styles.toggle__item, { [styles._active]: isActive })}
+          onClick={() => handleItemClick(item)}
+        >
+          {item.text}
+        </div>
+      );
+    });
   }
 
   return <div className={classnames(styles.toggle, props.className)}>{renderItems()}</div>;

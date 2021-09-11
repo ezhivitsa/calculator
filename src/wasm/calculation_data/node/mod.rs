@@ -73,7 +73,7 @@ impl Node {
         node.borrow().get_value(measurement)
       },
       None => {
-        panic!(String::from(error_message));
+        panic!("{}", String::from(error_message));
       }
     }
   }
@@ -84,7 +84,7 @@ impl Node {
         node.borrow().get_value(measurement)
       },
       None => {
-        panic!(String::from(error_message));
+        panic!("{}", String::from(error_message));
       }
     }
   }

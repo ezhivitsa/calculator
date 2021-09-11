@@ -1,2 +1,2 @@
-import './comand-handlers';
+import './command-handlers';
 import './event-handlers';

@@ -25,110 +25,106 @@ const buttons: {
   { type: MathOperation.Plus, text: operationTexts.plus, keyCodes: KeyCodes.Plus },
 ];
 
-export const MathButtons = observer(
-  (): ReactElement => {
-    const history = useHistoryStore();
-    const { lastCalculatedExpression } = history;
+export const MathButtons = observer((): ReactElement => {
+  const history = useHistoryStore();
+  const { lastCalculatedExpression } = history;
 
-    let timeout: number | null = null;
+  let timeout: number | null = null;
 
-    function handleButtonClick(action: MathOperation): void {
-      addAction(action);
+  function handleButtonClick(action: MathOperation): void {
+    addAction(action);
+  }
+
+  function handleCleanMouseDown(): void {
+    if (timeout) {
+      clearTimeout(timeout);
     }
 
-    function handleCleanMouseDown(): void {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
+    timeout = window.setTimeout(() => {
+      timeout = null;
+      cleanAll();
+    }, LONG_PRESS_TIMEOUT);
+  }
 
-      timeout = window.setTimeout(() => {
-        timeout = null;
-        cleanAll();
-      }, LONG_PRESS_TIMEOUT);
+  function handleCleanMouseUp(): void {
+    if (!timeout) {
+      return;
     }
 
-    function handleCleanMouseUp(): void {
-      if (!timeout) {
+    clearTimeout(timeout);
+    timeout = null;
+
+    if (!lastCalculatedExpression) {
+      clean();
+    } else {
+      cleanAll();
+    }
+    history.removeLastExpression();
+  }
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent): void {
+      if (event.key === KeyCodes.Shift) {
         return;
       }
 
-      clearTimeout(timeout);
-      timeout = null;
+      const button = buttons.find((b): boolean => {
+        if (b.keyCodes instanceof Array) {
+          return b.keyCodes.includes(event.key);
+        }
 
-      if (!lastCalculatedExpression) {
-        clean();
-      } else {
-        cleanAll();
+        return b.keyCodes === event.key;
+      });
+
+      if (button) {
+        handleButtonClick(button.type);
+        return;
       }
-      history.removeLastExpression();
+
+      if (event.key === KeyCodes.Backspace) {
+        clean();
+        event.preventDefault();
+      }
     }
 
-    useEffect(() => {
-      function handleKeyDown(event: KeyboardEvent): void {
-        if (event.key === KeyCodes.Shift) {
-          return;
-        }
+    document.addEventListener('keydown', handleKeyDown);
 
-        const button = buttons.find((b): boolean => {
-          if (b.keyCodes instanceof Array) {
-            return b.keyCodes.includes(event.key);
-          }
+    return function cleanup() {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  });
 
-          return b.keyCodes === event.key;
-        });
+  function renderCleanButton(): ReactNode {
+    const text = lastCalculatedExpression ? cleanButtonTexts.cleanResult : cleanButtonTexts.cleanOne;
+    return (
+      <Button
+        className={classnames(styles.mathButtons__btn, styles._clean)}
+        onMouseDown={handleCleanMouseDown}
+        onMouseUp={handleCleanMouseUp}
+      >
+        {text}
+      </Button>
+    );
+  }
 
-        if (button) {
-          handleButtonClick(button.type);
-          return;
-        }
-
-        if (event.key === KeyCodes.Backspace) {
-          clean();
-          event.preventDefault();
-        }
-      }
-
-      document.addEventListener('keydown', handleKeyDown);
-
-      return function cleanup() {
-        document.removeEventListener('keydown', handleKeyDown);
-      };
-    });
-
-    function renderCleanButton(): ReactNode {
-      const text = lastCalculatedExpression ? cleanButtonTexts.cleanResult : cleanButtonTexts.cleanOne;
+  function renderButtons(): ReactNode[] {
+    return buttons.map((buttonData, index): ReactNode => {
       return (
         <Button
-          className={classnames(styles.mathButtons__btn, styles._clean)}
-          onMouseDown={handleCleanMouseDown}
-          onMouseUp={handleCleanMouseUp}
+          key={index}
+          className={styles.mathButtons__btn}
+          onClick={(): void => handleButtonClick(buttonData.type)}
         >
-          {text}
+          {buttonData.text}
         </Button>
       );
-    }
+    });
+  }
 
-    function renderButtons(): ReactNode[] {
-      return buttons.map(
-        (buttonData, index): ReactNode => {
-          return (
-            <Button
-              key={index}
-              className={styles.mathButtons__btn}
-              onClick={(): void => handleButtonClick(buttonData.type)}
-            >
-              {buttonData.text}
-            </Button>
-          );
-        },
-      );
-    }
-
-    return (
-      <div className={styles.mathButtons}>
-        {renderCleanButton()}
-        {renderButtons()}
-      </div>
-    );
-  },
-);
+  return (
+    <div className={styles.mathButtons}>
+      {renderCleanButton()}
+      {renderButtons()}
+    </div>
+  );
+});

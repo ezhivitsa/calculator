@@ -1,4 +1,4 @@
-import { action, observable, computed, runInAction } from 'mobx';
+import { action, observable, computed, runInAction, makeObservable } from 'mobx';
 
 import { handle } from 'services/event-bus';
 
@@ -77,6 +77,8 @@ export class PresentationStore {
   private _timeout: number | null = null;
 
   constructor() {
+    makeObservable(this);
+
     this._initHandlers();
   }
 

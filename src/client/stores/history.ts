@@ -1,4 +1,4 @@
-import { observable, action, computed } from 'mobx';
+import { observable, action, computed, makeObservable } from 'mobx';
 
 import { handle } from 'services/event-bus';
 import { addValueOrReplace, addExpressionOrReplace } from 'services/app/calculation.app-service';
@@ -48,6 +48,8 @@ export class HistoryStore {
   @observable private _lastCalculatedExpression: ExpressionValue[] | null = null;
 
   constructor() {
+    makeObservable(this);
+
     this._initHandlers();
   }
 

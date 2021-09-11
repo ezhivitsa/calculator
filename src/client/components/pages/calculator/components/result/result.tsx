@@ -12,34 +12,32 @@ import { History } from './components/history';
 
 import styles from './result.pcss';
 
-export const Result = observer(
-  (): ReactElement => {
-    const { expression, showTemplateForNewLevel, result, animate } = usePresentationStore();
-    const { answer, lastCalculatedExpression } = useHistoryStore();
+export const Result = observer((): ReactElement => {
+  const { expression, showTemplateForNewLevel, result, animate } = usePresentationStore();
+  const { answer, lastCalculatedExpression } = useHistoryStore();
 
-    return (
-      <div className={styles.result}>
-        <History />
+  return (
+    <div className={styles.result}>
+      <History />
 
-        <div className={classnames(styles.result__topExpression, { [styles._animate]: animate })}>
-          {lastCalculatedExpression ? (
-            <>
-              <Expression expression={lastCalculatedExpression} />
-              <span> =</span>
-            </>
-          ) : (
-            <>{answer && `${buttonTexts.ans} = ${answer}`}</>
-          )}
-        </div>
-
-        <div className={classnames(styles.result__expression, { [styles._animate]: animate })}>
-          <Expression
-            expression={lastCalculatedExpression ? result : expression}
-            showTemplateForNewLevel={showTemplateForNewLevel}
-            highlightImaginaryPart
-          />
-        </div>
+      <div className={classnames(styles.result__topExpression, { [styles._animate]: animate })}>
+        {lastCalculatedExpression ? (
+          <>
+            <Expression expression={lastCalculatedExpression} />
+            <span> =</span>
+          </>
+        ) : (
+          <>{answer && `${buttonTexts.ans} = ${answer}`}</>
+        )}
       </div>
-    );
-  },
-);
+
+      <div className={classnames(styles.result__expression, { [styles._animate]: animate })}>
+        <Expression
+          expression={lastCalculatedExpression ? result : expression}
+          showTemplateForNewLevel={showTemplateForNewLevel}
+          highlightImaginaryPart
+        />
+      </div>
+    </div>
+  );
+});

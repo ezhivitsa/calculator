@@ -3,6 +3,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 
+const port = process.env.PORT || 8080;
 const dist = path.resolve(__dirname, 'dist');
 
 module.exports = {
@@ -17,8 +18,21 @@ module.exports = {
     filename: '[name].js',
   },
   devServer: {
-    contentBase: dist,
     hot: true,
+    port,
+    allowedHosts: 'all',
+    static: {
+      directory: path.join(__dirname, 'pkg'),
+      watch: {
+        aggregateTimeout: 300,
+        poll: 100,
+      },
+    },
+  },
+
+  experiments: {
+    // asyncWebAssembly: true,
+    syncWebAssembly: true,
   },
 
   resolve: {
@@ -46,16 +60,21 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1,
+              sourceMap: true,
               modules: {
                 mode: 'local',
                 localIdentName: '[local]--[hash:base64:5]',
-                context: path.resolve(__dirname, 'src/client'),
+                localIdentContext: path.resolve(__dirname, 'src/client'),
+                exportLocalsConvention: 'dashesOnly',
               },
-              localsConvention: 'dashesOnly',
             },
           },
-          'postcss-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
         ],
       },
     ],
@@ -69,6 +88,7 @@ module.exports = {
       crateDirectory: __dirname,
       outName: 'calculator',
       outDir: 'pkg',
+      extraArgs: '--target web --mode normal',
     }),
   ],
 };

@@ -3,3 +3,8 @@ node_modules
 /target
 /pkg
 /wasm-pack.log
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions

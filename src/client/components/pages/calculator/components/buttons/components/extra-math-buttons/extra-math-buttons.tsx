@@ -60,15 +60,13 @@ export function ExtraMathButtons(): ReactElement {
   });
 
   function renderButtons(): ReactNode[] {
-    return buttons.map(
-      (button): ReactNode => {
-        return (
-          <Button key={button.title} className={styles.extraMathButtons__btn} onClick={button.onClick} view="grey">
-            {button.title}
-          </Button>
-        );
-      },
-    );
+    return buttons.map((button): ReactNode => {
+      return (
+        <Button key={button.title} className={styles.extraMathButtons__btn} onClick={button.onClick} view="grey">
+          {button.title}
+        </Button>
+      );
+    });
   }
 
   return <div className={styles.extraMathButtons}>{renderButtons()}</div>;

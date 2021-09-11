@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
-
 import type { CalculationData } from 'pkg/calculator';
 import { MathOperation, PrefixModifier, MeasurementType, PostfixModifier } from 'stores/types';
 
@@ -20,7 +18,8 @@ export class CalculatorAdapter {
   }
 
   private async _init(): Promise<void> {
-    const { CalculationData } = await import('../../../../pkg/calculator');
+    const { default: init, CalculationData } = await import('../../../../pkg/calculator');
+    await init('calculator_bg.wasm');
     this._calculatorInstance = CalculationData.new();
 
     this._executeActions(this._calculatorInstance);
@@ -42,7 +41,7 @@ export class CalculatorAdapter {
   }
 
   private _addPromiseAction<T>(
-    resolve: () => void,
+    resolve: (value: T) => void,
     reject: () => void,
     callback: (instance: CalculationData) => T | Promise<T>,
   ): void {

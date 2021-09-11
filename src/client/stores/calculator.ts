@@ -1,4 +1,4 @@
-import { observable, action, computed } from 'mobx';
+import { observable, action, computed, makeObservable } from 'mobx';
 
 import { handle } from 'services/event-bus';
 
@@ -9,6 +9,8 @@ export class CalculatorStore {
   @observable private _measurementType: MeasurementType = MeasurementType.Rad;
 
   constructor() {
+    makeObservable(this);
+
     this._initHandlers();
   }
 

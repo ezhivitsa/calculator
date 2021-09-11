@@ -3,7 +3,7 @@
 		"target": "esnext",
 		"outDir": "./dist/",
 		"strictNullChecks": true,
-		"moduleResolution": "classic",
+		"moduleResolution": "Node",
 		"allowJs": true,
 		"noEmit": true,
 		"strict": true,

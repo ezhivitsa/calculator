@@ -61,7 +61,7 @@ export function format(value: string): string {
   if (fractionPart.length > MAX_FRACTION_PART) {
     const [zeros] = fractionPart.match(START_ZEROS_REG_EXP) || [];
 
-    if (zeros.length >= MAX_FRACTION_PART && naturalPart === ZERO_VALUE) {
+    if (zeros && zeros.length >= MAX_FRACTION_PART && naturalPart === ZERO_VALUE) {
       const fraction = fractionPart.slice(zeros.length);
       return `${sign}${fractionPart[zeros.length]}.${round(fraction, MAX_FRACTION_PART - 1)}${EXPONENT}${MINUS_SIGN}${
         zeros.length

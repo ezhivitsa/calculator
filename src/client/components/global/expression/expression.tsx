@@ -36,7 +36,6 @@ export function Expression(props: Props): ReactElement {
   }
 
   function renderNextLevel(expression: ExpressionValue[], level: number, index: number): ReactElement {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return <sup key={`sup-${level}-${index}`}>{renderExpression(expression, level, index)}</sup>;
   }
 
